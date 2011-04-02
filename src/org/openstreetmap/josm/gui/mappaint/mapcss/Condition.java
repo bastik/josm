@@ -17,10 +17,31 @@ import org.openstreetmap.josm.gui.mappaint.mapcss.Condition.Op;
 
 abstract public class Condition {
 
+    protected final Context context;
+
     abstract public boolean applies(Environment e);
+
+    public Condition(Context context) {
+        this.context = context;
+    }
 
     public static enum Op { EQ, NEQ, GREATER_OR_EQUAL, GREATER, LESS_OR_EQUAL, LESS,
         REGEX, ONE_OF, BEGINS_WITH, ENDS_WITH, CONTAINS }
+
+    /**
+     * context, where the condition applies
+     */
+    public static enum Context {
+        /**
+         * normal primitive selector, e.g. way[highway=residential]
+         */
+        PRIMITIVE,
+        
+        /**
+         * link between primitives, e.g. relation >[role=outer] way
+         */
+        LINK
+    }
 
     public final static EnumSet<Op> COMPARISON_OPERATERS =
             EnumSet.of(Op.GREATER_OR_EQUAL, Op.GREATER, Op.LESS_OR_EQUAL, Op.LESS);
@@ -32,7 +53,8 @@ abstract public class Condition {
         public Op op;
         private float v_float;
 
-        public KeyValueCondition(String k, String v, Op op) {
+        public KeyValueCondition(String k, String v, Op op, Context context) {
+            super(context);
             this.k = k;
             this.v = v;
             this.op = op;
@@ -91,7 +113,7 @@ abstract public class Condition {
 
         @Override
         public String toString() {
-            return "[" + k + "'" + op + "'" + v + "]";
+            return "[" + k + "'" + op + "'" + v + "]"+context;
         }
     }
 
@@ -101,7 +123,8 @@ abstract public class Condition {
         private boolean not;
         private boolean yes;
 
-        public KeyCondition(String k, boolean not, boolean yes) {
+        public KeyCondition(String k, boolean not, boolean yes, Context context) {
+            super(context);
             this.k = k;
             this.not = not;
             this.yes = yes;
@@ -126,7 +149,8 @@ abstract public class Condition {
         String id;
         boolean not;
 
-        public PseudoClassCondition(String id, boolean not) {
+        public PseudoClassCondition(String id, boolean not, Context context) {
+            super(context);
             this.id = id;
             this.not = not;
         }
@@ -165,7 +189,8 @@ abstract public class Condition {
 
         private Expression e;
 
-        public ExpressionCondition(Expression e) {
+        public ExpressionCondition(Expression e, Context context) {
+            super(context);
             this.e = e;
         }
 

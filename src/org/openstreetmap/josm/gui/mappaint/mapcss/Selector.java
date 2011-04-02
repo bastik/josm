@@ -45,7 +45,9 @@ public interface Selector {
      *
      */
     public static class ChildOrParentSelector implements Selector {
-        Selector a, b;
+        private final Selector left;
+        private final LinkSelector link;
+        private final Selector right;
         /** true, if this represents a parent selector (otherwise it is a child selector)
          */
         private final boolean parentSelector;
@@ -56,15 +58,16 @@ public interface Selector {
          * @param b the second selector
          * @param parentSelector if true, this is a parent selector; otherwise a child selector
          */
-        public ChildOrParentSelector(Selector a, Selector b, boolean parentSelector) {
-            this.a = a;
-            this.b = b;
+        public ChildOrParentSelector(Selector a, LinkSelector link, Selector b, boolean parentSelector) {
+            this.left = a;
+            this.link = link;
+            this.right = b;
             this.parentSelector = parentSelector;
         }
 
         @Override
         public boolean matches(Environment e) {
-            if (!b.matches(e))
+            if (!right.matches(e))
                 return false;
 
             Environment e2 = new Environment(null, e.mc, e.layer, e.source);
@@ -72,7 +75,7 @@ public interface Selector {
             if (!parentSelector) {
                 for (OsmPrimitive ref : e.osm.getReferrers()) {
                     e2.osm = ref;
-                    if (a.matches(e2)) {
+                    if (left.matches(e2)) {
                         matchingRefs.add(ref);
                     }
                 }
@@ -84,13 +87,13 @@ public interface Selector {
                 if (e.osm instanceof Relation) {
                     for (OsmPrimitive chld : ((Relation) e.osm).getMemberPrimitives()) {
                         e2.osm = chld;
-                        if (a.matches(e2))
+                        if (left.matches(e2))
                             return true;
                     }
                 } else if (e.osm instanceof Way) {
                     for (Node n : ((Way) e.osm).getNodes()) {
                         e2.osm = n;
-                        if (a.matches(e2))
+                        if (left.matches(e2))
                             return true;
                     }
                 }
@@ -100,12 +103,45 @@ public interface Selector {
 
         @Override
         public String getSubpart() {
-            return b.getSubpart();
+            return right.getSubpart();
         }
 
         @Override
         public Range getRange() {
-            return b.getRange();
+            return right.getRange();
+        }
+
+        @Override
+        public String toString() {
+            return left +" "+ (parentSelector? "<" : ">")+link+" " +right;
+        }
+    }
+
+    public static class LinkSelector implements Selector {
+        protected List<Condition> conditions;
+
+        public LinkSelector(List<Condition> conditions) {
+            this.conditions = conditions;
+        }
+
+        @Override
+        public boolean matches(Environment env) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public String getSubpart() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Range getRange() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public String toString() {
+            return "LinkSelector{" + "conditions=" + conditions + '}';
         }
     }
 
