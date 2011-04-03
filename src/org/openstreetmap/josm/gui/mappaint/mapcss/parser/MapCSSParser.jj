@@ -316,7 +316,7 @@ Condition condition(Context context) :
         LOOKAHEAD( simple_key_value_condition(context) s() <RSQUARE> )
             c=simple_key_value_condition(context) s() <RSQUARE> { return c; }
         |
-            e=expression() <RSQUARE> { return new Condition.ExpressionCondition(e, context); }
+            e=expression() <RSQUARE> { return Condition.create(e, context); }
     )
 }
 
@@ -341,7 +341,7 @@ Condition simple_key_condition(Context context) :
     ( <EXCLAMATION> { not = true; } )?
     key=tag_key()
     ( <QUESTION> { yes = true; } )?
-    { return new Condition.KeyCondition(key, not, yes, context); }
+    { return Condition.create(key, not, yes, context); }
 }
 
 Condition simple_key_value_condition(Context context) :
@@ -393,7 +393,7 @@ Condition simple_key_value_condition(Context context) :
             s()
             f=float_() { val=Float.toString(f); }
     )
-    { return new Condition.KeyValueCondition(key, val, op, context); }
+    { return Condition.create(key, val, op, context); }
 }
 
 Condition pseudoclass(Context context) :
@@ -405,7 +405,7 @@ Condition pseudoclass(Context context) :
     ( <EXCLAMATION> { not = true; } )? 
     <COLON>
     t=<IDENT>
-    { return new Condition.PseudoClassCondition(t.image, not, context); }
+    { return Condition.create(t.image, not, context); }
 }
 
 String subpart() :

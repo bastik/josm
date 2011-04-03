@@ -471,7 +471,7 @@ public class MapCSSParser implements MapCSSParserConstants {
       case MINUS:
         e = expression();
         jj_consume_token(RSQUARE);
-                                       {if (true) return new Condition.ExpressionCondition(e, context);}
+                                       {if (true) return Condition.create(e, context);}
         break;
       default:
         jj_la1[22] = jj_gen;
@@ -540,7 +540,7 @@ public class MapCSSParser implements MapCSSParserConstants {
       jj_la1[26] = jj_gen;
       ;
     }
-      {if (true) return new Condition.KeyCondition(key, not, yes, context);}
+      {if (true) return Condition.create(key, not, yes, context);}
     throw new Error("Missing return statement in function");
   }
 
@@ -660,7 +660,7 @@ public class MapCSSParser implements MapCSSParserConstants {
         throw new ParseException();
       }
     }
-      {if (true) return new Condition.KeyValueCondition(key, val, op, context);}
+      {if (true) return Condition.create(key, val, op, context);}
     throw new Error("Missing return statement in function");
   }
 
@@ -678,7 +678,7 @@ public class MapCSSParser implements MapCSSParserConstants {
     }
     jj_consume_token(COLON);
     t = jj_consume_token(IDENT);
-      {if (true) return new Condition.PseudoClassCondition(t.image, not, context);}
+      {if (true) return Condition.create(t.image, not, context);}
     throw new Error("Missing return statement in function");
   }
 

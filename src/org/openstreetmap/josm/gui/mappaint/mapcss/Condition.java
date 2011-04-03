@@ -21,6 +21,22 @@ abstract public class Condition {
 
     abstract public boolean applies(Environment e);
 
+    public static Condition create(String k, String v, Op op, Context context) {
+        return new KeyValueCondition(k, v, op, context);
+    }
+    
+    public static Condition create(String k, boolean not, boolean yes, Context context) {
+        return new KeyCondition(k, not, yes, context);
+    }
+    
+    public static Condition create(String id, boolean not, Context context) {
+        return new PseudoClassCondition(id, not, context);
+    }
+
+    public static Condition create(Expression e, Context context) {
+        return new ExpressionCondition(e, context);
+    }
+    
     public Condition(Context context) {
         this.context = context;
     }
