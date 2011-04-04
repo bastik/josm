@@ -45,6 +45,7 @@ public interface Selector {
      *
      */
     public static class ChildOrParentSelector implements Selector {
+        //static private final Logger logger = Logger.getLogger(ChildOrParentSelector.class.getName());
         private final Selector left;
         private final LinkSelector link;
         private final Selector right;
@@ -70,12 +71,13 @@ public interface Selector {
             if (!right.matches(e))
                 return false;
 
-            Environment e2 = new Environment(null, e.mc, e.layer, e.source);
             List<OsmPrimitive> matchingRefs = new ArrayList<OsmPrimitive>();
             if (!parentSelector) {
                 for (OsmPrimitive ref : e.osm.getReferrers()) {
-                    e2.osm = ref;
-                    if (left.matches(e2)) {
+                    if (!link.matches(e.withParent(ref).withLinkContext())) {
+                        continue;
+                    }
+                    if (left.matches(e.withChild(ref))) {
                         matchingRefs.add(ref);
                     }
                 }
@@ -86,14 +88,18 @@ public interface Selector {
             } else {
                 if (e.osm instanceof Relation) {
                     for (OsmPrimitive chld : ((Relation) e.osm).getMemberPrimitives()) {
-                        e2.osm = chld;
-                        if (left.matches(e2))
+                        if (!link.matches(e.withParent(e.osm).withChild(chld).withLinkContext())) {
+                            continue;
+                        }
+                        if (left.matches(e.withChild(chld)))
                             return true;
                     }
                 } else if (e.osm instanceof Way) {
                     for (Node n : ((Way) e.osm).getNodes()) {
-                        e2.osm = n;
-                        if (left.matches(e2))
+                        if (!link.matches(e.withParent(e.osm).withChild(n).withLinkContext())) {
+                            continue;
+                        }
+                        if (left.matches(e.withChild(n)))
                             return true;
                     }
                 }
@@ -126,7 +132,11 @@ public interface Selector {
 
         @Override
         public boolean matches(Environment env) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            Utils.ensure(env.isLinkContext(), "Requires LINK context in environment, got ''{0}''", env.getContext());
+            for (Condition c: conditions) {
+                if (!c.applies(env)) return false;
+            }
+            return true;
         }
 
         @Override

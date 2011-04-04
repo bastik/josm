@@ -2,6 +2,7 @@
 package org.openstreetmap.josm.tools;
 
 import java.awt.Color;
+import java.text.MessageFormat;
 import java.util.Collection;
 
 public class Utils {
@@ -59,9 +60,8 @@ public class Utils {
                 return a;
             return b;
         } else {
-            if (a < c) {
+            if (a < c)
                 return a;
-            }
             return c;
         }
     }
@@ -161,5 +161,12 @@ public class Utils {
 
     public static Color complement(Color clr) {
         return new Color(255 - clr.getRed(), 255 - clr.getGreen(), 255 - clr.getBlue(), clr.getAlpha());
+    }
+
+    public static void ensure(boolean condition, String message, Object...data) {
+        if (!condition)
+            throw new AssertionError(
+                    MessageFormat.format(message,data)
+            );
     }
 }
