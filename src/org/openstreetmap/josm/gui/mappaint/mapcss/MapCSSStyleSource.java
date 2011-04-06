@@ -160,8 +160,8 @@ public class MapCSSStyleSource extends StyleSource {
         Environment env = new Environment(osm, mc, null, this);
         for (MapCSSRule r : rules) {
             for (Selector s : r.selectors) {
-                env.clearMatchingReferrers();
-                if (s.matches(env)) { // as side effect env.matchingReferrers will be set (if s is a child selector)
+                env.clearSelectorMatchingInformation();
+                if (s.matches(env)) { // as side effect env.parent will be set (if s is a child selector)
                     if (s.getRange().contains(scale)) {
                         mc.range = Range.cut(mc.range, s.getRange());
                     } else {

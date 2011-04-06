@@ -9,10 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.mappaint.Cascade;
 import org.openstreetmap.josm.gui.mappaint.Environment;
@@ -95,7 +93,7 @@ abstract public class Condition {
             if (COMPARISON_OPERATERS.contains(op)) {
                 v_float = Float.parseFloat(v);
             }
-            if (Context.LINK.equals(context) && ! "role".equalsIgnoreCase(k))
+            if (Context.LINK.equals(context) && ! ("role".equalsIgnoreCase(k) || "index".equalsIgnoreCase(k)))
                 throw new MapCSSException(
                         MessageFormat.format("Expected key ''role'' in link context. Got ''{0}''.", k)
                 );
@@ -153,13 +151,16 @@ abstract public class Condition {
             case PRIMITIVE:
                 return matchesValue(env.osm.get(k));
             case LINK:
-                if (!env.hasParentRelation()) return false;
-                Relation r = (Relation)env.parent;
-                for (RelationMember m: r.getMembers()) {
-                    if (matchesValue(m.getRole()) && m.getMember().equals(env.osm)) return true;
+                if ("role".equalsIgnoreCase(k)) {
+                    if (!env.hasParentRelation()) return false;
+                    Relation r = (Relation)env.parent;
+                    return matchesValue(r.getMember(env.index).getRole());
+                } else if ("index".equalsIgnoreCase(k)) {
+                    if (env.index == null) return false;
+                    return matchesValue(Integer.toString(env.index + 1));
                 }
+            default: throw new AssertionError();
             }
-            return false;
         }
 
         @Override
@@ -209,13 +210,6 @@ abstract public class Condition {
                 );
         }
 
-        protected boolean hasMatchingMember(Relation r, String role, OsmPrimitive child){
-            for (RelationMember m: r.getMembers()) {
-                if (m.getMember().equals(child) && m.getRole().equals(role)) return true;
-            }
-            return false;
-        }
-
         @Override
         public boolean applies(Environment e) {
             switch(e.getContext()) {
@@ -226,10 +220,9 @@ abstract public class Condition {
                     return e.osm.hasKey(label) ^ exclamationMarkPresent;
             case LINK:
                 if (!e.hasParentRelation()) return false;
-                Relation parent = (Relation)e.parent;
-                return hasMatchingMember(parent, label, e.osm) ^ exclamationMarkPresent;
+                return equal(label, ((Relation)e.parent).getMember(e.index).getRole()) ^ exclamationMarkPresent;
+            default: throw new AssertionError();
             }
-            return false; // not reached
         }
 
         @Override

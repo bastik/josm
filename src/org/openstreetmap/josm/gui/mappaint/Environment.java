@@ -1,37 +1,32 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.gui.mappaint;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Condition.Context;
-import org.openstreetmap.josm.gui.mappaint.mapcss.Instruction;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.LinkSelector;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 
 public class Environment {
 
     public OsmPrimitive osm;
-    /**
-     * If not null, this is the matching parent object if an condition or an expression
-     * is evaluated in a {@link LinkSelector}
-     */
-    public OsmPrimitive parent;
+
     public MultiCascade mc;
     public String layer;
     public StyleSource source;
     private Context context = Context.PRIMITIVE;
 
     /**
-     * <p>When matching a child selector, the matching referrers will be stored.
-     * They can be accessed in {@link Instruction#execute(Environment)} to access
-     * tags from parent objects.</p>
+     * If not null, this is the matching parent object if an condition or an expression
+     * is evaluated in a {@link LinkSelector}
      */
-    private List<OsmPrimitive> matchingReferrers = null;
+    public OsmPrimitive parent;
 
+    /**
+     * index of node in parent way or member in parent relation
+     */
+    public Integer index = null;
+    
     /**
      * Creates a new uninitialized environment
      */
@@ -56,13 +51,11 @@ public class Environment {
         this.layer = other.layer;
         this.parent = other.parent;
         this.source = other.source;
-        if (other.matchingReferrers != null){
-            this.matchingReferrers = new ArrayList<OsmPrimitive>(other.matchingReferrers);
-        }
+        this.index = other.index;
         this.context = other.getContext();
     }
 
-    public Environment withChild(OsmPrimitive child) {
+    public Environment withPrimitive(OsmPrimitive child) {
         Environment e = new Environment(this);
         e.osm = child;
         return e;
@@ -71,6 +64,12 @@ public class Environment {
     public Environment withParent(OsmPrimitive parent) {
         Environment e = new Environment(this);
         e.parent = parent;
+        return e;
+    }
+    
+    public Environment withIndex(int index) {
+        Environment e = new Environment(this);
+        e.index = index;
         return e;
     }
 
@@ -94,18 +93,6 @@ public class Environment {
         return parent != null && parent instanceof Relation;
     }
 
-    public Collection<OsmPrimitive> getMatchingReferrers() {
-        return matchingReferrers;
-    }
-
-    public void setMatchingReferrers(List<OsmPrimitive> refs) {
-        matchingReferrers = refs;
-    }
-
-    public void clearMatchingReferrers() {
-        matchingReferrers = null;
-    }
-
     /**
      * Replies the current context.
      * 
@@ -113,5 +100,10 @@ public class Environment {
      */
     public Context getContext() {
         return context == null ? Context.PRIMITIVE : context;
+    }
+    
+    public void clearSelectorMatchingInformation() {
+        parent = null;
+        index = null;
     }
 }

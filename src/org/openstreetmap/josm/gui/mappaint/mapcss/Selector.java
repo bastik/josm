@@ -8,6 +8,7 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.mappaint.Environment;
 import org.openstreetmap.josm.gui.mappaint.Range;
@@ -74,32 +75,49 @@ public interface Selector {
             List<OsmPrimitive> matchingRefs = new ArrayList<OsmPrimitive>();
             if (!parentSelector) {
                 for (OsmPrimitive ref : e.osm.getReferrers()) {
-                    if (!link.matches(e.withParent(ref).withLinkContext())) {
-                        continue;
-                    }
-                    if (left.matches(e.withChild(ref))) {
+                    if (left.matches(e.withPrimitive(ref))) {
                         matchingRefs.add(ref);
                     }
-                }
-                if (!matchingRefs.isEmpty()) {
-                    e.setMatchingReferrers(matchingRefs);
-                    return true;
+                    if (ref instanceof Way) {
+                        List<Node> wayNodes = ((Way) ref).getNodes();
+                        for (int i=0; i<wayNodes.size(); i++) {
+                            if (wayNodes.get(i).equals(e.osm)) {
+                                if (link.matches(e.withParent(ref).withIndex(i).withLinkContext())) {
+                                    e.parent = ref;
+                                    e.index = i;
+                                    return true;
+                                }
+                            }
+                        }
+                    } else if (ref instanceof Relation) {
+                        List<RelationMember> members = ((Relation) ref).getMembers();
+                        for (int i=0; i<members.size(); i++) {
+                            RelationMember m = members.get(i);
+                            if (m.getMember().equals(e.osm)) {
+                                if (link.matches(e.withParent(ref).withIndex(i).withLinkContext())) {
+                                    e.parent = ref;
+                                    e.index = i;
+                                    return true;
+                                }
+                            }
+                        }                        
+                    }
                 }
             } else {
                 if (e.osm instanceof Relation) {
                     for (OsmPrimitive chld : ((Relation) e.osm).getMemberPrimitives()) {
-                        if (!link.matches(e.withParent(e.osm).withChild(chld).withLinkContext())) {
+                        if (!link.matches(e.withParent(e.osm).withPrimitive(chld).withLinkContext())) {
                             continue;
                         }
-                        if (left.matches(e.withChild(chld)))
+                        if (left.matches(e.withPrimitive(chld)))
                             return true;
                     }
                 } else if (e.osm instanceof Way) {
                     for (Node n : ((Way) e.osm).getNodes()) {
-                        if (!link.matches(e.withParent(e.osm).withChild(n).withLinkContext())) {
+                        if (!link.matches(e.withParent(e.osm).withPrimitive(n).withLinkContext())) {
                             continue;
                         }
-                        if (left.matches(e.withChild(n)))
+                        if (left.matches(e.withPrimitive(n)))
                             return true;
                     }
                 }
