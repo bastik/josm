@@ -17,32 +17,102 @@ import org.openstreetmap.josm.gui.mappaint.Environment;
 
 abstract public class Condition {
 
-    protected final Context context;
-
     abstract public boolean applies(Environment e);
 
     public static Condition create(String k, String v, Op op, Context context) {
-        return new KeyValueCondition(k, v, op, context);
+        switch (context) {
+            case PRIMITIVE: 
+                return new KeyValueCondition(k, v, op);
+            case LINK:
+                if ("role".equalsIgnoreCase(k)) {
+                    return new RoleCondition(v, op);
+                } else if ("index".equalsIgnoreCase(k)) {
+                    return new IndexCondition(v, op);
+                } else
+                    throw new MapCSSException(
+                        MessageFormat.format("Expected key ''role'' or ''index'' in link context. Got ''{0}''.", k));
+
+            default: throw new AssertionError();
+        }
     }
 
     public static Condition create(String k, boolean not, boolean yes, Context context) {
-        return new KeyCondition(k, not, yes, context);
+        switch (context) {
+            case PRIMITIVE: 
+                return new KeyCondition(k, not, yes);
+            case LINK:
+                if (yes)
+                    throw new MapCSSException("Question mark operator ''?'' not supported in LINK context");
+                if (not)
+                    return new RoleCondition(k, Op.NEQ);
+                else
+                    return new RoleCondition(k, Op.EQ);
+                
+            default: throw new AssertionError();
+        }
     }
 
     public static Condition create(String id, boolean not, Context context) {
-        return new PseudoClassCondition(id, not, context);
+        return new PseudoClassCondition(id, not);
     }
 
     public static Condition create(Expression e, Context context) {
-        return new ExpressionCondition(e, context);
+        return new ExpressionCondition(e);
     }
 
-    public Condition(Context context) {
-        this.context = context;
+    public static enum Op { 
+        EQ, NEQ, GREATER_OR_EQUAL, GREATER, LESS_OR_EQUAL, LESS,
+        REGEX, ONE_OF, BEGINS_WITH, ENDS_WITH, CONTAINS;
+        
+        public boolean eval(String testString, String prototypeString) {
+            if (testString == null && this != NEQ)
+                return false;
+            switch (this) {
+            case EQ:
+                return equal(testString, prototypeString);
+            case NEQ:
+                return !equal(testString, prototypeString);
+            case REGEX:
+                Pattern p = Pattern.compile(prototypeString);
+                Matcher m = p.matcher(testString);
+                return m.find();
+            case ONE_OF:
+                String[] parts = testString.split(";");
+                for (String part : parts) {
+                    if (equal(prototypeString, part.trim()))
+                        return true;
+                }
+                return false;
+            case BEGINS_WITH:
+                return testString.startsWith(prototypeString);
+            case ENDS_WITH:
+                return testString.endsWith(prototypeString);
+            case CONTAINS:
+                return testString.contains(prototypeString);
+            }
+            
+            float test_float;
+            try {
+                test_float = Float.parseFloat(testString);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            float prototype_float = Float.parseFloat(prototypeString);
+            
+            switch (this) {
+            case GREATER_OR_EQUAL:
+                return test_float >= prototype_float;
+            case GREATER:
+                return test_float > prototype_float;
+            case LESS_OR_EQUAL:
+                return test_float <= prototype_float;
+            case LESS:
+                return test_float < prototype_float;
+            default:
+                throw new AssertionError();
+            }
+        }
     }
-
-    public static enum Op { EQ, NEQ, GREATER_OR_EQUAL, GREATER, LESS_OR_EQUAL, LESS,
-        REGEX, ONE_OF, BEGINS_WITH, ENDS_WITH, CONTAINS }
 
     /**
      * context, where the condition applies
@@ -64,7 +134,7 @@ abstract public class Condition {
 
     /**
      * <p>Represents a key/value condition which is either applied to a primitive or to
-     * a "link" between two primities, i.e. to a role of a relation member.</p>
+     * a "link" between two primitives, i.e. to a role of a relation member.</p>
      * 
      */
     public static class KeyValueCondition extends Condition {
@@ -72,7 +142,6 @@ abstract public class Condition {
         public String k;
         public String v;
         public Op op;
-        private float v_float;
 
         /**
          * <p>Creates a key/value-condition.</p>
@@ -85,87 +154,53 @@ abstract public class Condition {
          * @param op the operation
          * @param context the context
          */
-        public KeyValueCondition(String k, String v, Op op, Context context) throws MapCSSException {
-            super(context);
+        public KeyValueCondition(String k, String v, Op op) throws MapCSSException {
             this.k = k;
             this.v = v;
             this.op = op;
-            if (COMPARISON_OPERATERS.contains(op)) {
-                v_float = Float.parseFloat(v);
-            }
-            if (Context.LINK.equals(context) && ! ("role".equalsIgnoreCase(k) || "index".equalsIgnoreCase(k)))
-                throw new MapCSSException(
-                        MessageFormat.format("Expected key ''role'' in link context. Got ''{0}''.", k)
-                );
-        }
-
-        protected boolean matchesValue(String val){
-            if (val == null && op != Op.NEQ)
-                return false;
-            switch (op) {
-            case EQ:
-                return equal(val, v);
-            case NEQ:
-                return !equal(val, v);
-            case REGEX:
-                Pattern p = Pattern.compile(v);
-                Matcher m = p.matcher(val);
-                return m.find();
-            case ONE_OF:
-                String[] parts = val.split(";");
-                for (String part : parts) {
-                    if (equal(v, part.trim()))
-                        return true;
-                }
-                return false;
-            case BEGINS_WITH:
-                return val.startsWith(v);
-            case ENDS_WITH:
-                return val.endsWith(v);
-            case CONTAINS:
-                return val.contains(v);
-            }
-            float val_float;
-            try {
-                val_float = Float.parseFloat(val);
-            } catch (NumberFormatException e) {
-                return false;
-            }
-            switch (op) {
-            case GREATER_OR_EQUAL:
-                return val_float >= v_float;
-            case GREATER:
-                return val_float > v_float;
-            case LESS_OR_EQUAL:
-                return val_float <= v_float;
-            case LESS:
-                return val_float < v_float;
-            default:
-                throw new AssertionError();
-            }
         }
 
         @Override
         public boolean applies(Environment env) {
-            switch(env.getContext()) {
-            case PRIMITIVE:
-                return matchesValue(env.osm.get(k));
-            case LINK:
-                if ("role".equalsIgnoreCase(k)) {
-                    if (!env.hasParentRelation()) return false;
-                    Relation r = (Relation)env.parent;
-                    return matchesValue(r.getMember(env.index).getRole());
-                } else if ("index".equalsIgnoreCase(k)) {
-                    if (env.index == null) return false;
-                    return matchesValue(Integer.toString(env.index + 1));
-                }
-            default: throw new AssertionError();
-            }
+            return op.eval(env.osm.get(k), v);
         }
 
         @Override
         public String toString() {
-            return "[" + k + "'" + op + "'" + v + "]"+context;
+            return "[" + k + "'" + op + "'" + v + "]";
+        }
+    }
+    
+    public static class RoleCondition extends Condition {
+        public String role;
+        public Op op;
+
+        public RoleCondition(String role, Op op) {
+            this.role = role;
+            this.op = op;
+        }
+        
+        @Override
+        public boolean applies(Environment env) {
+            if (!env.hasParentRelation()) return false;
+            Relation r = (Relation)env.parent;
+            return op.eval(r.getMember(env.index).getRole(), role);
+        }        
+    }
+    
+    public static class IndexCondition extends Condition {
+        public String index;
+        public Op op;
+
+        public IndexCondition(String index, Op op) {
+            this.index = index;
+            this.op = op;
+        }
+        
+        @Override
+        public boolean applies(Environment env) {
+            if (env.index == null) return false;
+            return op.eval(Integer.toString(env.index + 1), index);
         }
     }
 
@@ -199,15 +234,10 @@ abstract public class Condition {
          * @param context
          * @throws MapCSSException thrown if {@code questionMarkPresent} is true in a {@link Context#LINK link context}
          */
-        public KeyCondition(String label, boolean exclamationMarkPresent, boolean questionMarkPresent, Context context) throws MapCSSException{
-            super(context);
+        public KeyCondition(String label, boolean exclamationMarkPresent, boolean questionMarkPresent) throws MapCSSException{
             this.label = label;
             this.exclamationMarkPresent = exclamationMarkPresent;
             this.questionMarkPresent = questionMarkPresent;
-            if (Context.LINK.equals(context) && questionMarkPresent)
-                throw new MapCSSException(
-                        "Question mark operator ''?'' not supported in LINK context"
-                );
         }
 
         @Override
@@ -236,8 +266,7 @@ abstract public class Condition {
         String id;
         boolean not;
 
-        public PseudoClassCondition(String id, boolean not, Context context) {
-            super(context);
+        public PseudoClassCondition(String id, boolean not) {
             this.id = id;
             this.not = not;
         }
@@ -275,8 +304,7 @@ abstract public class Condition {
 
         private Expression e;
 
-        public ExpressionCondition(Expression e, Context context) {
-            super(context);
+        public ExpressionCondition(Expression e) {
             this.e = e;
         }
 
@@ -291,5 +319,4 @@ abstract public class Condition {
             return "[" + e + "]";
         }
     }
-
 }
