@@ -3,19 +3,26 @@ package org.openstreetmap.josm.gui.mappaint.mapcss;
 
 public class MapCSSException extends RuntimeException {
 
-    public MapCSSException() {
-        super();
+    protected String specialmessage;
+    protected Integer line;
+    protected Integer column;
+    
+    public MapCSSException(String specialmessage) {
+        this.specialmessage = specialmessage;
     }
 
-    public MapCSSException(String message, Throwable cause) {
-        super(message, cause);
+    public void setColumn(int column) {
+        this.column = column;
     }
 
-    public MapCSSException(String message) {
-        super(message);
+    public void setLine(int line) {
+        this.line = line;
     }
-
-    public MapCSSException(Throwable cause) {
-        super(cause);
+    
+    @Override
+    public String getMessage() {
+        if (line == null || column == null)
+            return specialmessage;
+        return String.format("Error at line %s, column %s: %s", line, column, specialmessage);
     }
 }

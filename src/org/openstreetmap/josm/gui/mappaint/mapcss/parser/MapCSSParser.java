@@ -15,6 +15,7 @@ import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Expression.FunctionExpression;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Expression.LiteralExpression;
+import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSException;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.ChildOrParentSelector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.GeneralSelector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.LinkSelector;
@@ -238,11 +239,18 @@ public class MapCSSParser implements MapCSSParserConstants {
         break label_3;
       }
       try {
-        r = rule();
-                       if (r != null) { sheet.rules.add(r); }
+        /*            try {*/
+                        r = rule();
+                           if (r != null) { sheet.rules.add(r); }
         w();
+      } catch (MapCSSException mex) {
+            error_skipto(RBRACE, mex);
+            w();
+/*                throw new ParseException(mex.getMessage());*/
+/*            }*/
+
       } catch (ParseException ex) {
-            error_skipto(RBRACE);
+            error_skipto(RBRACE, null);
             w();
       }
     }
@@ -1113,14 +1121,25 @@ public class MapCSSParser implements MapCSSParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  void error_skipto(int kind) throws ParseException {
+  void error_skipto(int kind, MapCSSException me) throws ParseException {
     if (token.kind == EOF)
         throw new ParseException("Reached end of file while parsing");
-    ParseException e = generateParseException();
+
+    Exception e = null;
+    ParseException pe = generateParseException();
+
+    if (me != null) {
+        me.setLine(pe.currentToken.next.beginLine);
+        me.setColumn(pe.currentToken.next.beginColumn);
+        e = me;
+    } else {
+        e = new ParseException(pe.getMessage()); // prevent memory leak
+    }
+
     System.err.println("Skipping to the next rule, because of an error:");
     System.err.println(e);
     if (sheet != null) {
-        sheet.logError(new ParseException(e.getMessage()));
+        sheet.logError(e);
     }
     Token t;
     do {
@@ -1204,18 +1223,6 @@ public class MapCSSParser implements MapCSSParserConstants {
     finally { jj_save(6, xla); }
   }
 
-  private boolean jj_3R_15() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(9)) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_60() {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
   private boolean jj_3R_25() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1247,14 +1254,21 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_57() {
-    if (jj_scan_token(COLON)) return true;
-    if (jj_scan_token(IDENT)) return true;
+  private boolean jj_3R_15() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(9)) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3R_38() {
-    if (jj_scan_token(REGEX)) return true;
+  private boolean jj_3R_60() {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_57() {
+    if (jj_scan_token(COLON)) return true;
+    if (jj_scan_token(IDENT)) return true;
     return false;
   }
 
@@ -1282,6 +1296,11 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
+  private boolean jj_3R_38() {
+    if (jj_scan_token(REGEX)) return true;
+    return false;
+  }
+
   private boolean jj_3R_16() {
     if (jj_3R_23()) return true;
     if (jj_3R_15()) return true;
@@ -1299,26 +1318,6 @@ public class MapCSSParser implements MapCSSParserConstants {
 
   private boolean jj_3R_83() {
     if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_58() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_75()) {
-    jj_scanpos = xsp;
-    if (jj_3R_76()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_75() {
-    if (jj_scan_token(IDENT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_28() {
-    if (jj_3R_52()) return true;
     return false;
   }
 
@@ -1346,8 +1345,23 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_56() {
-    if (jj_scan_token(STRING)) return true;
+  private boolean jj_3R_58() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_75()) {
+    jj_scanpos = xsp;
+    if (jj_3R_76()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_75() {
+    if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    if (jj_3R_52()) return true;
     return false;
   }
 
@@ -1378,6 +1392,11 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
+  private boolean jj_3R_56() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
   private boolean jj_3R_35() {
     if (jj_3R_20()) return true;
     Token xsp;
@@ -1385,22 +1404,6 @@ public class MapCSSParser implements MapCSSParserConstants {
       xsp = jj_scanpos;
       if (jj_3R_87()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3R_51() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_59()) {
-    jj_scanpos = xsp;
-    if (jj_3R_60()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_59() {
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_29()) return true;
     return false;
   }
 
@@ -1441,20 +1444,26 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
+  private boolean jj_3R_51() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_59()) {
+    jj_scanpos = xsp;
+    if (jj_3R_60()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_59() {
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
   private boolean jj_3_2() {
     if (jj_3R_16()) return true;
     if (jj_3R_15()) return true;
     if (jj_scan_token(RSQUARE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(3)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(2)) return true;
-    }
     return false;
   }
 
@@ -1478,18 +1487,12 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_27() {
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_52()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
+  private boolean jj_3R_29() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_27()) {
+    if (jj_scan_token(3)) {
     jj_scanpos = xsp;
-    if (jj_3R_28()) return true;
+    if (jj_scan_token(2)) return true;
     }
     return false;
   }
@@ -1512,6 +1515,22 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
+  private boolean jj_3R_27() {
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_52()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) return true;
+    }
+    return false;
+  }
+
   private boolean jj_3R_74() {
     if (jj_scan_token(QUESTION)) return true;
     if (jj_3R_19()) return true;
@@ -1521,11 +1540,6 @@ public class MapCSSParser implements MapCSSParserConstants {
     if (jj_3R_19()) return true;
     if (jj_3R_54()) return true;
     if (jj_3R_19()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_52() {
-    if (jj_scan_token(UINT)) return true;
     return false;
   }
 
@@ -1552,6 +1566,11 @@ public class MapCSSParser implements MapCSSParserConstants {
     if (jj_3R_19()) return true;
     if (jj_3R_54()) return true;
     if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_52() {
+    if (jj_scan_token(UINT)) return true;
     return false;
   }
 
@@ -1778,13 +1797,6 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_30() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_15()) return true;
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
   private boolean jj_3R_46() {
     if (jj_3R_58()) return true;
     return false;
@@ -1800,20 +1812,10 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_18() {
+  private boolean jj_3R_30() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_15()) return true;
     if (jj_3R_29()) return true;
-    Token xsp;
-    if (jj_3R_30()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_30()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_53() {
-    if (jj_scan_token(COMMENT_START)) return true;
-    if (jj_scan_token(COMMENT_END)) return true;
     return false;
   }
 
@@ -1835,6 +1837,17 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
+  private boolean jj_3R_18() {
+    if (jj_3R_29()) return true;
+    Token xsp;
+    if (jj_3R_30()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_30()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
   private boolean jj_3_3() {
     if (jj_3R_17()) return true;
     return false;
@@ -1842,6 +1855,30 @@ public class MapCSSParser implements MapCSSParserConstants {
 
   private boolean jj_3R_44() {
     if (jj_scan_token(STAR)) return true;
+    if (jj_scan_token(EQUAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    if (jj_scan_token(COMMENT_START)) return true;
+    if (jj_scan_token(COMMENT_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43() {
+    if (jj_scan_token(DOLLAR)) return true;
+    if (jj_scan_token(EQUAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_scan_token(CARET)) return true;
+    if (jj_scan_token(EQUAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41() {
+    if (jj_scan_token(TILDE)) return true;
     if (jj_scan_token(EQUAL)) return true;
     return false;
   }
@@ -1861,8 +1898,7 @@ public class MapCSSParser implements MapCSSParserConstants {
     return false;
   }
 
-  private boolean jj_3R_43() {
-    if (jj_scan_token(DOLLAR)) return true;
+  private boolean jj_3R_40() {
     if (jj_scan_token(EQUAL)) return true;
     return false;
   }
@@ -1873,23 +1909,6 @@ public class MapCSSParser implements MapCSSParserConstants {
       xsp = jj_scanpos;
       if (jj_3R_31()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_scan_token(CARET)) return true;
-    if (jj_scan_token(EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_41() {
-    if (jj_scan_token(TILDE)) return true;
-    if (jj_scan_token(EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_40() {
-    if (jj_scan_token(EQUAL)) return true;
     return false;
   }
 

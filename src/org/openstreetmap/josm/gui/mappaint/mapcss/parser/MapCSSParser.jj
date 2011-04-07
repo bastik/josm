@@ -20,6 +20,7 @@ import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Expression.FunctionExpression;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Expression.LiteralExpression;
+import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSException;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.ChildOrParentSelector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.GeneralSelector;
 import org.openstreetmap.josm.gui.mappaint.mapcss.Selector.LinkSelector;
@@ -225,9 +226,12 @@ void sheet(MapCSSStyleSource sheet):
     w()
     (
         try {
-            r=rule() { if (r != null) { sheet.rules.add(r); } } w()
+                r=rule() { if (r != null) { sheet.rules.add(r); } } w()
+        } catch (MapCSSException mex) {
+            error_skipto(RBRACE, mex);
+            w();
         } catch (ParseException ex) {
-            error_skipto(RBRACE);
+            error_skipto(RBRACE, null);
             w();
         }
     )*
@@ -558,14 +562,25 @@ Object literal() :
 }
 
 JAVACODE
-void error_skipto(int kind) {
+void error_skipto(int kind, MapCSSException me) {
     if (token.kind == EOF)
         throw new ParseException("Reached end of file while parsing");
-    ParseException e = generateParseException();
+        
+    Exception e = null;        
+    ParseException pe = generateParseException();
+
+    if (me != null) {
+        me.setLine(pe.currentToken.next.beginLine);
+        me.setColumn(pe.currentToken.next.beginColumn);
+        e = me;
+    } else {
+        e = new ParseException(pe.getMessage()); // prevent memory leak
+    }
+    
     System.err.println("Skipping to the next rule, because of an error:");
     System.err.println(e);
     if (sheet != null) {
-        sheet.logError(new ParseException(e.getMessage()));
+        sheet.logError(e);
     }
     Token t;
     do {
