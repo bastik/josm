@@ -21,34 +21,34 @@ abstract public class Condition {
 
     public static Condition create(String k, String v, Op op, Context context) {
         switch (context) {
-            case PRIMITIVE: 
-                return new KeyValueCondition(k, v, op);
-            case LINK:
-                if ("role".equalsIgnoreCase(k)) {
-                    return new RoleCondition(v, op);
-                } else if ("index".equalsIgnoreCase(k)) {
-                    return new IndexCondition(v, op);
-                } else
-                    throw new MapCSSException(
+        case PRIMITIVE:
+            return new KeyValueCondition(k, v, op);
+        case LINK:
+            if ("role".equalsIgnoreCase(k))
+                return new RoleCondition(v, op);
+            else if ("index".equalsIgnoreCase(k))
+                return new IndexCondition(v, op);
+            else
+                throw new MapCSSException(
                         MessageFormat.format("Expected key ''role'' or ''index'' in link context. Got ''{0}''.", k));
 
-            default: throw new AssertionError();
+        default: throw new AssertionError();
         }
     }
 
     public static Condition create(String k, boolean not, boolean yes, Context context) {
         switch (context) {
-            case PRIMITIVE: 
-                return new KeyCondition(k, not, yes);
-            case LINK:
-                if (yes)
-                    throw new MapCSSException("Question mark operator ''?'' not supported in LINK context");
-                if (not)
-                    return new RoleCondition(k, Op.NEQ);
-                else
-                    return new RoleCondition(k, Op.EQ);
-                
-            default: throw new AssertionError();
+        case PRIMITIVE:
+            return new KeyCondition(k, not, yes);
+        case LINK:
+            if (yes)
+                throw new MapCSSException("Question mark operator ''?'' not supported in LINK context");
+            if (not)
+                return new RoleCondition(k, Op.NEQ);
+            else
+                return new RoleCondition(k, Op.EQ);
+
+        default: throw new AssertionError();
         }
     }
 
@@ -60,10 +60,10 @@ abstract public class Condition {
         return new ExpressionCondition(e);
     }
 
-    public static enum Op { 
+    public static enum Op {
         EQ, NEQ, GREATER_OR_EQUAL, GREATER, LESS_OR_EQUAL, LESS,
         REGEX, ONE_OF, BEGINS_WITH, ENDS_WITH, CONTAINS;
-        
+
         public boolean eval(String testString, String prototypeString) {
             if (testString == null && this != NEQ)
                 return false;
@@ -90,7 +90,7 @@ abstract public class Condition {
             case CONTAINS:
                 return testString.contains(prototypeString);
             }
-            
+
             float test_float;
             try {
                 test_float = Float.parseFloat(testString);
@@ -98,7 +98,7 @@ abstract public class Condition {
                 return false;
             }
             float prototype_float = Float.parseFloat(prototypeString);
-            
+
             switch (this) {
             case GREATER_OR_EQUAL:
                 return test_float >= prototype_float;
@@ -170,7 +170,7 @@ abstract public class Condition {
             return "[" + k + "'" + op + "'" + v + "]";
         }
     }
-    
+
     public static class RoleCondition extends Condition {
         public String role;
         public Op op;
@@ -179,15 +179,15 @@ abstract public class Condition {
             this.role = role;
             this.op = op;
         }
-        
+
         @Override
         public boolean applies(Environment env) {
-            if (!env.hasParentRelation()) return false;
-            Relation r = (Relation)env.parent;
-            return op.eval(r.getMember(env.index).getRole(), role);
-        }        
+            String testRole = env.getRole();
+            if (testRole == null) return false;
+            return op.eval(testRole, role);
+        }
     }
-    
+
     public static class IndexCondition extends Condition {
         public String index;
         public Op op;
@@ -196,7 +196,7 @@ abstract public class Condition {
             this.index = index;
             this.op = op;
         }
-        
+
         @Override
         public boolean applies(Environment env) {
             if (env.index == null) return false;

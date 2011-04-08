@@ -16,7 +16,6 @@ import org.openstreetmap.josm.actions.search.SearchCompiler;
 import org.openstreetmap.josm.actions.search.SearchCompiler.Match;
 import org.openstreetmap.josm.actions.search.SearchCompiler.ParseError;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.mappaint.Cascade;
 import org.openstreetmap.josm.gui.mappaint.Environment;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
@@ -189,17 +188,15 @@ public interface Expression {
             public boolean has_tag_key(String key) {
                 return env.osm.hasKey(key);
             }
-            
+
             public Float index() {
-                if (env.index == null) 
+                if (env.index == null)
                     return null;
                 return new Float(env.index + 1);
             }
-            
+
             public String role() {
-                if (env.index == null || !env.hasParentRelation()) 
-                    return null;
-                return ((Relation)env.parent).getMember(env.index).getRole();
+                return env.getRole();
             }
 
             public boolean not(boolean b) {

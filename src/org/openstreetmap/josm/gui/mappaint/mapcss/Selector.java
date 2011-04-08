@@ -1,7 +1,6 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.gui.mappaint.mapcss;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openstreetmap.josm.data.osm.Node;
@@ -72,12 +71,8 @@ public interface Selector {
             if (!right.matches(e))
                 return false;
 
-            List<OsmPrimitive> matchingRefs = new ArrayList<OsmPrimitive>();
             if (!parentSelector) {
                 for (OsmPrimitive ref : e.osm.getReferrers()) {
-                    if (left.matches(e.withPrimitive(ref))) {
-                        matchingRefs.add(ref);
-                    }
                     if (ref instanceof Way) {
                         List<Node> wayNodes = ((Way) ref).getNodes();
                         for (int i=0; i<wayNodes.size(); i++) {
@@ -100,25 +95,34 @@ public interface Selector {
                                     return true;
                                 }
                             }
-                        }                        
+                        }
                     }
                 }
             } else {
-                if (e.osm instanceof Relation) {
-                    for (OsmPrimitive chld : ((Relation) e.osm).getMemberPrimitives()) {
-                        if (!link.matches(e.withParent(e.osm).withPrimitive(chld).withLinkContext())) {
-                            continue;
+                if (e.osm instanceof Way) {
+                    List<Node> wayNodes = ((Way) e.osm).getNodes();
+                    for (int i=0; i<wayNodes.size(); i++) {
+                        Node n = wayNodes.get(i);
+                        if (left.matches(e.withPrimitive(n))) {
+                            if (link.matches(e.withChild(n).withIndex(i).withLinkContext())) {
+                                e.child = n;
+                                e.index = i;
+                                return true;
+                            }
                         }
-                        if (left.matches(e.withPrimitive(chld)))
-                            return true;
                     }
-                } else if (e.osm instanceof Way) {
-                    for (Node n : ((Way) e.osm).getNodes()) {
-                        if (!link.matches(e.withParent(e.osm).withPrimitive(n).withLinkContext())) {
-                            continue;
+                }
+                else if (e.osm instanceof Relation) {
+                    List<RelationMember> members = ((Relation) e.osm).getMembers();
+                    for (int i=0; i<members.size(); i++) {
+                        OsmPrimitive member = members.get(i).getMember();
+                        if (left.matches(e.withPrimitive(member))) {
+                            if (link.matches(e.withChild(member).withIndex(i).withLinkContext())) {
+                                e.child = member;
+                                e.index = i;
+                                return true;
+                            }
                         }
-                        if (left.matches(e.withPrimitive(n)))
-                            return true;
                     }
                 }
             }

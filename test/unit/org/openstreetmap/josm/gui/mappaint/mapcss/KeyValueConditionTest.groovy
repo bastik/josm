@@ -12,7 +12,6 @@ import org.openstreetmap.josm.data.osm.RelationMember
 import org.openstreetmap.josm.fixtures.JOSMFixture
 import org.openstreetmap.josm.gui.mappaint.Environment
 import org.openstreetmap.josm.gui.mappaint.mapcss.Condition.Context
-import org.openstreetmap.josm.gui.mappaint.mapcss.Condition.KeyValueCondition
 import org.openstreetmap.josm.gui.mappaint.mapcss.Condition.Op
 
 
@@ -47,13 +46,13 @@ class KeyValueConditionTest {
     
     @Test
     public void create() {
-        KeyValueCondition c = new KeyValueCondition("a key", "a value", Op.EQ, Context.PRIMITIVE)
+        Condition c = Condition.create("a key", "a value", Op.EQ, Context.PRIMITIVE)
         
-        c = new KeyValueCondition("role", "a role", Op.EQ, Context.LINK)
-        c = new KeyValueCondition("RoLe", "a role", Op.EQ, Context.LINK)
+        c = Condition.create("role", "a role", Op.EQ, Context.LINK)
+        c = Condition.create("RoLe", "a role", Op.EQ, Context.LINK)
         
         shouldFail(MapCSSException) {
-            c = new KeyValueCondition("an arbitry tag", "a role", Op.EQ, Context.LINK)
+            c = Condition.create("an arbitry tag", "a role", Op.EQ, Context.LINK)
         }
     }
     
@@ -63,12 +62,12 @@ class KeyValueConditionTest {
         Node n = node(1)
         r.addMember(new RelationMember("my_role", n))
         
-        Environment e = new Environment().withChild(n).withParent(r).withLinkContext()
+        Environment e = new Environment().withPrimitive(n).withParent(r).withLinkContext().withIndex(0)
         
-        KeyValueCondition cond = new KeyValueCondition("role", "my_role", Op.EQ, Context.LINK)
+        Condition cond = new Condition.RoleCondition("my_role", Op.EQ)
         assert cond.applies(e)        
         
-        cond = new KeyValueCondition("role", "another_role", Op.EQ, Context.LINK)
+        cond = new Condition.RoleCondition("another_role", Op.EQ)
         assert !cond.applies(e)
     }
     
@@ -78,12 +77,12 @@ class KeyValueConditionTest {
         Node n = node(1)
         r.addMember(new RelationMember("my_role", n))
         
-        Environment e = new Environment().withChild(n).withParent(r).withLinkContext()
+        Environment e = new Environment().withPrimitive(n).withParent(r).withIndex(0).withLinkContext()
         
-        KeyValueCondition cond = new KeyValueCondition("role", "my_role", Op.NEQ, Context.LINK)
+        Condition cond = Condition.create("role", "my_role", Op.NEQ, Context.LINK)
         assert !cond.applies(e)
         
-        cond = new KeyValueCondition("role", "another_role", Op.NEQ, Context.LINK)
+        cond = Condition.create("role", "another_role", Op.NEQ, Context.LINK)
         assert cond.applies(e)
     }
     

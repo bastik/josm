@@ -18,15 +18,19 @@ public class Environment {
 
     /**
      * If not null, this is the matching parent object if an condition or an expression
-     * is evaluated in a {@link LinkSelector}
+     * is evaluated in a {@link LinkSelector} (within a child selector)
      */
     public OsmPrimitive parent;
+    /**
+     * The same for parent selector. Only one of the 2 fields (parent or child) is not null in any environment.
+     */
+    public OsmPrimitive child;
 
     /**
-     * index of node in parent way or member in parent relation
+     * index of node in parent way or member in parent relation. Must be != null in LINK context.
      */
     public Integer index = null;
-    
+
     /**
      * Creates a new uninitialized environment
      */
@@ -50,14 +54,15 @@ public class Environment {
         this.mc = other.mc;
         this.layer = other.layer;
         this.parent = other.parent;
+        this.child = other.child;
         this.source = other.source;
         this.index = other.index;
         this.context = other.getContext();
     }
 
-    public Environment withPrimitive(OsmPrimitive child) {
+    public Environment withPrimitive(OsmPrimitive osm) {
         Environment e = new Environment(this);
-        e.osm = child;
+        e.osm = osm;
         return e;
     }
 
@@ -66,7 +71,13 @@ public class Environment {
         e.parent = parent;
         return e;
     }
-    
+
+    public Environment withChild(OsmPrimitive child) {
+        Environment e = new Environment(this);
+        e.child = child;
+        return e;
+    }
+
     public Environment withIndex(int index) {
         Environment e = new Environment(this);
         e.index = index;
@@ -101,9 +112,21 @@ public class Environment {
     public Context getContext() {
         return context == null ? Context.PRIMITIVE : context;
     }
-    
+
+    public String getRole() {
+        if (getContext().equals(Context.PRIMITIVE))
+            return null;
+
+        if (parent != null && parent instanceof Relation)
+            return ((Relation) parent).getMember(index).getRole();
+        if (child != null && osm instanceof Relation)
+            return ((Relation) osm).getMember(index).getRole();
+        return null;
+    }
+
     public void clearSelectorMatchingInformation() {
         parent = null;
+        child = null;
         index = null;
     }
 }
