@@ -14,6 +14,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.mappaint.Cascade;
 import org.openstreetmap.josm.gui.mappaint.Environment;
+import org.openstreetmap.josm.tools.Utils;
 
 abstract public class Condition {
 
@@ -133,8 +134,7 @@ abstract public class Condition {
         EnumSet.of(Op.GREATER_OR_EQUAL, Op.GREATER, Op.LESS_OR_EQUAL, Op.LESS);
 
     /**
-     * <p>Represents a key/value condition which is either applied to a primitive or to
-     * a "link" between two primitives, i.e. to a role of a relation member.</p>
+     * <p>Represents a key/value condition which is either applied to a primitive.</p>
      * 
      */
     public static class KeyValueCondition extends Condition {
@@ -146,15 +146,11 @@ abstract public class Condition {
         /**
          * <p>Creates a key/value-condition.</p>
          * 
-         * <p>Note, that only the key <tt>role</tt> (case-insensitive) is allowed if this
-         * condition is evaluated in a {@link Context#LINK link context}.
-         * 
          * @param k the key
          * @param v the value
          * @param op the operation
-         * @param context the context
          */
-        public KeyValueCondition(String k, String v, Op op) throws MapCSSException {
+        public KeyValueCondition(String k, String v, Op op) {
             this.k = k;
             this.v = v;
             this.op = op;
@@ -209,7 +205,7 @@ abstract public class Condition {
      * primitive context:</p>
      * <pre>
      *     ["a label"]  PRIMITIVE:   the primitive has a tag "a label"
-     *                  LINK:        the parent is a relation it has at least one member with the role
+     *                  LINK:        the parent is a relation and it has at least one member with the role
      *                               "a label" referring to the child
      * 
      *     [!"a label"]  PRIMITIVE:  the primitive doesn't have a tag "a label"
@@ -231,10 +227,8 @@ abstract public class Condition {
          * @param label
          * @param exclamationMarkPresent
          * @param questionMarkPresent
-         * @param context
-         * @throws MapCSSException thrown if {@code questionMarkPresent} is true in a {@link Context#LINK link context}
          */
-        public KeyCondition(String label, boolean exclamationMarkPresent, boolean questionMarkPresent) throws MapCSSException{
+        public KeyCondition(String label, boolean exclamationMarkPresent, boolean questionMarkPresent){
             this.label = label;
             this.exclamationMarkPresent = exclamationMarkPresent;
             this.questionMarkPresent = questionMarkPresent;
@@ -249,8 +243,8 @@ abstract public class Condition {
                 else
                     return e.osm.hasKey(label) ^ exclamationMarkPresent;
             case LINK:
-                if (!e.hasParentRelation()) return false;
-                return equal(label, ((Relation)e.parent).getMember(e.index).getRole()) ^ exclamationMarkPresent;
+                Utils.ensure(false, "Illegal state: KeyCondition not supported in LINK context");
+                return false;
             default: throw new AssertionError();
             }
         }
