@@ -73,6 +73,8 @@ public interface Selector {
 
             if (!parentSelector) {
                 for (OsmPrimitive ref : e.osm.getReferrers()) {
+                    if (!left.matches(e.withPrimitive(ref)))
+                        continue;
                     if (ref instanceof Way) {
                         List<Node> wayNodes = ((Way) ref).getNodes();
                         for (int i=0; i<wayNodes.size(); i++) {
