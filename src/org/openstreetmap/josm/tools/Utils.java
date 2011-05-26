@@ -47,6 +47,15 @@ public class Utils {
         }
         return null;
     }
+    
+    public static <S, T extends S> SubclassFilteredCollection<S, T> filteredCollection(Collection<S> collection, final Class<T> klass) {
+        return new SubclassFilteredCollection<S, T>(collection, new Predicate<S>() {
+            @Override
+            public boolean evaluate(S o) {
+                return klass.isInstance(o);
+            }
+        });
+    }
 
     public static <T> int indexOf(Iterable<? extends T> collection, Predicate<? super T> predicate) {
         int i = 0;
