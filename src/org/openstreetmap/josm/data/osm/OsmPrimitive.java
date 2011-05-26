@@ -39,7 +39,7 @@ import org.openstreetmap.josm.tools.Predicate;
  *
  * @author imi
  */
-abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, PrimitiveId {
+abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, IPrimitive {
 
     private static final AtomicLong idCounter = new AtomicLong(0);
 
@@ -396,7 +396,8 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @see #setVersion(int)
      */
-    public long getVersion() {
+    @Override
+    public int getVersion() {
         return version;
     }
 
@@ -405,6 +406,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @return the id of this primitive.
      */
+    @Override
     public long getId() {
         long id = this.id;
         return id >= 0?id:0;
@@ -414,6 +416,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @return Osm id if primitive already exists on the server. Unique negative value if primitive is new
      */
+    @Override
     public long getUniqueId() {
         return id;
     }
@@ -422,6 +425,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @return True if primitive is new (not yet uploaded the server, id <= 0)
      */
+    @Override
     public boolean isNew() {
         return id <= 0;
     }
@@ -495,6 +499,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @return the user who has last touched this object. May be null.
      */
+    @Override
     public User getUser() {
         return user;
     }
@@ -504,6 +509,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @param user the user
      */
+    @Override
     public void setUser(User user) {
         boolean locked = writeLock();
         try {
@@ -520,6 +526,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @return the id of the changeset this primitive was last uploaded to.
      */
+    @Override
     public int getChangesetId() {
         return changesetId;
     }
@@ -532,6 +539,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @throws IllegalStateException thrown if this primitive is new.
      * @throws IllegalArgumentException thrown if id < 0
      */
+    @Override
     public void setChangesetId(int changesetId) throws IllegalStateException, IllegalArgumentException {
         boolean locked = writeLock();
         try {
@@ -565,6 +573,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
         return getType();
     }
 
+    @Override
     public void setTimestamp(Date timestamp) {
         boolean locked = writeLock();
         try {
@@ -580,10 +589,12 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * used to check against edit conflicts.
      *
      */
+    @Override
     public Date getTimestamp() {
         return new Date(timestamp * 1000l);
     }
 
+    @Override
     public boolean isTimestampEmpty() {
         return timestamp == 0;
     }
@@ -673,6 +684,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @param modified true, if this primitive is to be modified
      */
+    @Override
     public void setModified(boolean modified) {
         updateFlags(FLAG_MODIFIED, modified);
     }
@@ -687,6 +699,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @return <code>true</code> if the object has been modified since it was loaded from
      * the server
      */
+    @Override
     public boolean isModified() {
         return (flags & FLAG_MODIFIED) != 0;
     }
@@ -697,6 +710,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @return <code>true</code>, if the object has been deleted.
      * @see #setDeleted(boolean)
      */
+    @Override
     public boolean isDeleted() {
         return (flags & FLAG_DELETED) != 0;
     }
@@ -736,6 +750,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @see #setVisible(boolean)
      */
+    @Override
     public boolean isVisible() {
         return (flags & FLAG_VISIBLE) != 0;
     }
@@ -748,6 +763,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @throws IllegalStateException thrown if visible is set to false on an primitive with
      * id==0
      */
+    @Override
     public void setVisible(boolean visible) throws IllegalStateException{
         boolean locked = writeLock();
         try {
@@ -766,6 +782,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @param deleted  true, if this primitive is deleted; false, otherwise
      */
+    @Override
     public void setDeleted(boolean deleted) {
         boolean locked = writeLock();
         try {
@@ -804,6 +821,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
         }
     }
 
+    @Override
     public boolean isIncomplete() {
         return (flags & FLAG_INCOMPLETE) != 0;
     }
@@ -994,6 +1012,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @return tags of this primitive. Changes made in returned map are not mapped
      * back to the primitive, use setKeys() to modify the keys
      */
+    @Override
     public Map<String, String> getKeys() {
         Map<String, String> result = new HashMap<String, String>();
         String[] keys = this.keys;
@@ -1011,6 +1030,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @param keys the key/value pairs to set. If null, removes all existing key/value pairs.
      */
+    @Override
     public void setKeys(Map<String, String> keys) {
         boolean locked = writeLock();
         try {
@@ -1042,6 +1062,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @see #remove(String)
      */
+    @Override
     public final void put(String key, String value) {
         boolean locked = writeLock();
         try {
@@ -1080,6 +1101,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @param key  the key to be removed. Ignored, if key is null.
      */
+    @Override
     public final void remove(String key) {
         boolean locked = writeLock();
         try {
@@ -1112,6 +1134,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      *
      * @since 1843
      */
+    @Override
     public final void removeAll() {
         boolean locked = writeLock();
         try {
@@ -1132,6 +1155,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @param key the key. Can be null, replies null in this case.
      * @return the value for key <code>key</code>.
      */
+    @Override
     public final String get(String key) {
         String[] keys = this.keys;
         if (key == null)
@@ -1144,6 +1168,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
         return null;
     }
 
+    @Override
     public final Collection<String> keySet() {
         String[] keys = this.keys;
         if (keys == null)
@@ -1161,6 +1186,7 @@ abstract public class OsmPrimitive implements Comparable<OsmPrimitive>, Tagged, 
      * @return true, if the map of key/value pairs of this primitive is not empty; false
      *   otherwise
      */
+    @Override
     public final boolean hasKeys() {
         return keys != null;
     }

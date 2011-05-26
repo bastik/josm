@@ -11,16 +11,18 @@ import org.openstreetmap.josm.data.osm.visitor.Visitor;
  *
  * @author imi
  */
-public final class Node extends OsmPrimitive {
+public final class Node extends OsmPrimitive implements INode {
 
     private CachedLatLon coor;
 
+    @Override
     public final void setCoor(LatLon coor) {
         if(coor != null){
             updateCoor(coor, null);
         }
     }
 
+    @Override
     public final void setEastNorth(EastNorth eastNorth) {
         if(eastNorth != null) {
             updateCoor(null, eastNorth);
@@ -40,10 +42,12 @@ public final class Node extends OsmPrimitive {
         }
     }
 
+    @Override
     public final LatLon getCoor() {
         return coor;
     }
 
+    @Override
     public final EastNorth getEastNorth() {
         return coor != null ? coor.getEastNorth() : null;
     }
