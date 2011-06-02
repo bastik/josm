@@ -3,12 +3,33 @@ package org.openstreetmap.josm.data.projection;
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.coor.EastNorth;
+import org.openstreetmap.josm.data.coor.LatLon;
 
 /**
  * Class to handle projections
  *
  */
 public class Projections {
+    
+    private static Map<LatLon, EastNorth> cache = new HashMap<LatLon, EastNorth>();
+
+    public static EastNorth get(LatLon ll) {
+        EastNorth en = cache.get(ll);
+        if (en == null) {
+            en = Main.proj.latlon2eastNorth(ll);
+            cache.put(ll, en);
+        }
+        return en;
+    }
+    
+    public static EastNorth get(double lat, double lon) {
+        return get(new LatLon(lat, lon));
+    }
+    
     /**
      * List of all available projections.
      */

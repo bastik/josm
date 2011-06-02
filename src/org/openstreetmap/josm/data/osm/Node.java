@@ -1,11 +1,13 @@
 // License: GPL. Copyright 2007 by Immanuel Scholz and others
 package org.openstreetmap.josm.data.osm;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.CachedLatLon;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.visitor.PrimitiveVisitor;
 import org.openstreetmap.josm.data.osm.visitor.Visitor;
+import org.openstreetmap.josm.data.projection.Projections;
 
 /**
  * One node data, consisting of one world coordinate waypoint.
@@ -14,7 +16,7 @@ import org.openstreetmap.josm.data.osm.visitor.Visitor;
  */
 public final class Node extends OsmPrimitive implements INode {
 
-    private CachedLatLon coor;
+    private double lat, lon;
 
     @Override
     public final void setCoor(LatLon coor) {
@@ -45,30 +47,25 @@ public final class Node extends OsmPrimitive implements INode {
 
     @Override
     public final LatLon getCoor() {
-        return coor;
+        return new LatLon(lat, lon);
     }
 
     @Override
     public final EastNorth getEastNorth() {
-        return coor != null ? coor.getEastNorth() : null;
+        return lat != Double.NaN ? Projections.get(lat, lon) : null;
     }
 
     /**
      * To be used only by Dataset.reindexNode
      */
     protected void setCoorInternal(LatLon coor, EastNorth eastNorth) {
-        if(this.coor == null) {
-            if (eastNorth == null) {
-                this.coor = new CachedLatLon(coor);
-            } else {
-                this.coor = new CachedLatLon(eastNorth);
-            }
+        if (coor != null) {
+            lat = coor.lat();
+            lon = coor.lon();
         } else {
-            if (eastNorth == null) {
-                this.coor.setCoor(coor);
-            } else {
-                this.coor.setEastNorth(eastNorth);
-            }
+            LatLon ll = Main.proj.eastNorth2latlon(eastNorth);
+            lat = ll.lat();
+            lon = ll.lon();
         }
     }
 
@@ -149,7 +146,7 @@ public final class Node extends OsmPrimitive implements INode {
         boolean locked = writeLock();
         try {
             super.cloneFrom(osm);
-            setCoor(((Node)osm).coor);
+            setCoor(((Node)osm).getCoor());
         } finally {
             writeUnlock(locked);
         }
@@ -172,7 +169,7 @@ public final class Node extends OsmPrimitive implements INode {
         try {
             super.mergeFrom(other);
             if (!other.isIncomplete()) {
-                setCoor(new LatLon(((Node)other).coor));
+                setCoor(new LatLon(((Node)other).getCoor()));
             }
         } finally {
             writeUnlock(locked);
@@ -199,7 +196,7 @@ public final class Node extends OsmPrimitive implements INode {
     }
 
     @Override public String toString() {
-        String coorDesc = coor == null?"":"lat="+coor.lat()+",lon="+coor.lon();
+        String coorDesc = lat == Double.NaN?"":"lat="+lat+",lon="+lon;
         return "{Node id=" + getUniqueId() + " version=" + getVersion() + " " + getFlagsAsString() + " "  + coorDesc+"}";
     }
 
@@ -210,12 +207,13 @@ public final class Node extends OsmPrimitive implements INode {
         if (! super.hasEqualSemanticAttributes(other))
             return false;
         Node n = (Node)other;
-        if (coor == null && n.coor == null)
-            return true;
-        else if (coor != null && n.coor != null)
-            return coor.equalsEpsilon(n.coor);
-        else
-            return false;
+        throw new UnsupportedOperationException("fixme");
+//        if (coor == null && n.coor == null)
+//            return true;
+//        else if (coor != null && n.coor != null)
+//            return coor.equalsEpsilon(n.coor);
+//        else
+//            return false;
     }
 
     @Override
@@ -252,13 +250,13 @@ public final class Node extends OsmPrimitive implements INode {
         builder.append("Unexpected error. Please report it to http://josm.openstreetmap.de/ticket/3892\n");
         builder.append(toString());
         builder.append("\n");
-        if (coor == null) {
-            builder.append("Coor is null\n");
-        } else {
-            builder.append(String.format("EastNorth: %s\n", coor.getEastNorth()));
-            builder.append(coor.getProjection());
-            builder.append("\n");
-        }
+//        if (coor == null) {
+//            builder.append("Coor is null\n");
+//        } else {
+//            builder.append(String.format("EastNorth: %s\n", coor.getEastNorth()));
+//            builder.append(coor.getProjection());
+//            builder.append("\n");
+//        }
 
         return builder.toString();
     }
