@@ -1,117 +1,304 @@
 <?xml version="1.0"?>
 <imagery>
-    <!--"true;OpenStreetMap (Mapnik);tms[18]:http://tile.openstreetmap.org/;;;osm;osm;osm"-->
-    <entry>
-        <name>Bing</name>
-        <type>bing</type>
-        <default>true</default>
-    </entry>
+    <!--"true;Landsat;http://irs.gis-lab.info/?layers=landsat&"-->
     <entry>
         <name>Landsat</name>
         <type>wms</type>
         <default>true</default>
         <url><![CDATA[http://irs.gis-lab.info/?layers=landsat&]]></url>
     </entry>
-    <entry>
-        <name>Yahoo Sat</name>
-        <type>html</type>
-        <url><![CDATA[http://josm.openstreetmap.de/wmsplugin/YahooDirect.html?]]></url>
-    </entry>
-    <entry>
-        <name>MapQuest Open Aerial</name>
-        <type>tms</type>
-        <default>true</default>
-        <url><![CDATA[http://oatile1.mqcdn.com/naip/{zoom}/{x}/{y}.png]]></url>
-    </entry>
-    <entry>
-    <!--"false;SPOTMaps (France);http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&;http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html"-->
-        <name>SPOTMaps (France)</name>
-        <type>wms</type>
-        <url><![CDATA[http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&]]></url>
-        <eula mandatory='true'><![CDATA[http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html]]></eula>
-    </entry>
-    <entry>
-    <!--"false;OpenPT Map;tms[5,16]:http://openptmap.de/tiles;;45.7,5.9,55.0,17.3;osm;osm;osm"-->
-        <name>OpenPT Map</name>
-        <type>tms</type>
-        <url><![CDATA[http://openptmap.de/tiles]]></url>
-        <min-zoom>5</min-zoom>
-        <max-zoom>16</max-zoom>
-        <bounds min-lat='45.7' min-lon='5.9' max-lat='55.0' max-lon='17.3'/>
-        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
-        <attribution-url>http://openstreetmap.org/</attribution-url>
-    </entry>
-    <entry>
-    <!--"false;ÖPNV;tms[18]:http://tile.xn-  -pnvkarte-m4a.de/tilegen;;;osm;osm;osm"-->
-        <name>ÖPNV</name>
-        <type>tms</type>
-        <url><![CDATA[http://tile.xn--pnvkarte-m4a.de/tilegen]]></url>
-        <max-zoom>18</max-zoom>
-
-        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
-        <attribution-url>http://openstreetmap.org/</attribution-url>
-        <terms-of-use-text>Background terms of use</terms-of-use-text>
-        <terms-of-use-url>http://www.openstreetmap.org/copyright</terms-of-use-url>
-        <!-- just for test - we don't really want a logo in this case -->
-        <logo-image>http://wiki.openstreetmap.org/w/images/c/c8/Public-images-osm_logo.png</logo-image>
-        <logo-url>http://wiki.openstreetmap.org/</logo-url>
-    </entry>
-</imagery>
-<?xml version="1.0"?>
-<imagery>
-    <!--"true;OpenStreetMap (Mapnik);tms[18]:http://tile.openstreetmap.org/;;;osm;osm;osm"-->
+    <!--"false;Open Aerial Map;http://openaerialmap.org/wms/?VERSION=1.0&request=GetMap&layers=world&styles=&format=image/jpeg&"-->
+    <!--"true;Bing Sat;bing:bing"-->
     <entry>
         <name>Bing</name>
         <type>bing</type>
+        <!-- url is used as identifier, so put something here -->
+        <url>http://www.bing.com/maps/</url>
         <default>true</default>
     </entry>
-    <entry>
-        <name>Landsat</name>
-        <type>wms</type>
-        <default>true</default>
-        <url><![CDATA[http://irs.gis-lab.info/?layers=landsat&]]></url>
-    </entry>
+    <!--"false;Yahoo Sat;html:http://josm.openstreetmap.de/wmsplugin/YahooDirect.html?"-->
     <entry>
         <name>Yahoo Sat</name>
         <type>html</type>
         <url><![CDATA[http://josm.openstreetmap.de/wmsplugin/YahooDirect.html?]]></url>
     </entry>
+    <!--"true;MapQuest Open Aerial;tms:http://oatile1.mqcdn.com/naip/{zoom}/{x}/{y}.png"-->
     <entry>
         <name>MapQuest Open Aerial</name>
         <type>tms</type>
         <default>true</default>
         <url><![CDATA[http://oatile1.mqcdn.com/naip/{zoom}/{x}/{y}.png]]></url>
     </entry>
+    <!--"true;OpenStreetMap (Mapnik);tms[18]:http://tile.openstreetmap.org/;;;osm;osm;osm"-->
     <entry>
+        <name>OpenStreetMap (Mapnik)</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.openstreetmap.org/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"true;OpenStreetMap (Mapnik B&W);tms[18]:http://{switch:a,b,c}.www.toolserver.org/tiles/bw-mapnik/{zoom}/{x}/{y}.png;;;osm;osm;osm"-->
+    <entry>
+        <name>OpenStreetMap (Mapnik Black &amp; White)</name>
+        <type>tms</type>
+        <url><![CDATA[http://{switch:a,b,c}.www.toolserver.org/tiles/bw-mapnik/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;OpenCycleMap;tms[17]:http://tile.opencyclemap.org/cycle;;;osm;osm;osm"-->
+    <entry>
+        <name>OpenCycleMap</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.opencyclemap.org/cycle/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>17</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;TilesAtHome;tms[17]:http://tah.openstreetmap.org/Tiles/tile;;;osm;osm;osm"-->
+    <entry>
+        <name>TilesAtHome</name>
+        <type>tms</type>
+        <url><![CDATA[http://tah.openstreetmap.org/Tiles/tile/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>17</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;MapQuest OSM;tms[18]:http://otile1.mqcdn.com/tiles/1.0.0/osm;;;osm;osm;osm"-->
+    <entry>
+        <name>MapQuest OSM</name>
+        <type>tms</type>
+        <url><![CDATA[http://otile1.mqcdn.com/tiles/1.0.0/osm/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;ODBL coverage;tms[5,18]:http://osm.informatik.uni-leipzig.de/osm_tiles2;;;osm;osm;osm"-->
+    <entry>
+        <name>ODBL coverage</name>
+        <type>tms</type>
+        <url><![CDATA[http://osm.informatik.uni-leipzig.de/osm_tiles2/{zoom}/{x}/{y}.png]]></url>
+        <min-zoom>5</min-zoom>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;ÖPNV;tms[18]:http://tile.xn- ### -pnvkarte-m4a.de/tilegen;;;osm;osm;osm"-->
+    <entry>
+        <name>ÖPNV</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.xn--pnvkarte-m4a.de/tilegen/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;German Style;tms[18]:http://{switch:a,b,c,d}.tile.openstreetmap.de/tiles/osmde/{zoom}/{x}/{y}.png;;;osm;osm;osm"-->
+    <entry>
+        <name>German Style</name>
+        <type>tms</type>
+        <url><![CDATA[http://{switch:a,b,c,d}.tile.openstreetmap.de/tiles/osmde/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;Streets NRW Geofabrik.de;http://tools.geofabrik.de/osmi/view/strassennrw/josmwms?"-->
+    <entry>
+        <name>Streets NRW Geofabrik.de</name>
+        <type>wms</type>
+        <url><![CDATA[http://tools.geofabrik.de/osmi/view/strassennrw/josmwms?]]></url>
+    </entry>
+    <!--"false;Hike & Bike;tms[18]:http://toolserver.org/tiles/hikebike/;;;osm;osm;osm"-->
+    <entry>
+        <name>Hike &amp; Bike</name>
+        <type>tms</type>
+        <url><![CDATA[http://toolserver.org/tiles/hikebike/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>18</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;Sorbische Karte;tms[17]:http://toolserver.org/tiles/osm-locale-hsb;;;osm;osm;osm"-->
+    <entry>
+        <name>Sorbische Karte</name>
+        <type>tms</type>
+        <url><![CDATA[http://toolserver.org/tiles/osm-locale-hsb/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>17</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;Deutsche Karte;tms[17]:http://toolserver.org/tiles/osm-locale-de;;;osm;osm;osm"-->
+    <entry>
+        <name>Deutsche Karte</name>
+        <type>tms</type>
+        <url><![CDATA[http://toolserver.org/tiles/osm-locale-de/{zoom}/{x}/{y}.png]]></url>
+        <max-zoom>17</max-zoom>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;OpenPT Map;tms[5,16]:http://openptmap.de/tiles;;45.7,5.9,55.0,17.3;osm;osm;osm"-->
+    <entry>
+        <name>OpenPT Map</name>
+        <type>tms</type>
+        <url><![CDATA[http://openptmap.de/tiles/]]></url>
+        <min-zoom>5</min-zoom>
+        <max-zoom>16</max-zoom>
+        <bounds min-lat='45.7' min-lon='5.9' max-lat='55.0' max-lon='17.3'/>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <!--"false;Geoimage.at;http://wms.geoimage.at/dop-1mfree?FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=Luftbild_1m&"-->
+    <entry>
+        <name>Geoimage.at</name>
+        <type>wms</type>
+        <url><![CDATA[http://wms.geoimage.at/dop-1mfree?FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=Luftbild_1m&]]></url>
+    </entry>
+    <!--"false;MSR Maps Topo;http://msrmaps.com/ogcmap.ashx?version=1.1.1&request=GetMap&Layers=drg&styles=&format=image/jpeg&"-->
+    <entry>
+        <name>MSR Maps Topo</name>
+        <type>wms</type>
+        <url><![CDATA[http://msrmaps.com/ogcmap.ashx?version=1.1.1&request=GetMap&Layers=drg&styles=&format=image/jpeg&]]></url>
+    </entry>
+    <!--"false;MSR Maps Urban;http://msrmaps.com/ogcmap.ashx?version=1.1.1&request=GetMap&Layers=urbanarea&styles=&format=image/jpeg&"-->
+    <entry>
+        <name>MSR Maps Urban</name>
+        <type>wms</type>
+        <url><![CDATA[http://msrmaps.com/ogcmap.ashx?version=1.1.1&request=GetMap&Layers=urbanarea&styles=&format=image/jpeg&]]></url>
+    </entry>
+    <!--"false;Czech CUZK:KM;http://wms.cuzk.cz/wms.asp?service=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=parcelni_cisla_i,obrazy_parcel_i,RST_KMD_I,hranice_parcel_i,DEF_BUDOVY,RST_KN_I,dalsi_p_mapy_i,prehledka_kat_prac,prehledka_kat_uz,prehledka_kraju-linie&FORMAT=image/png&transparent=TRUE&"-->
+    <entry>
+        <name>Czech CUZK:KM</name>
+        <type>wms</type>
+        <url><![CDATA[http://wms.cuzk.cz/wms.asp?service=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=parcelni_cisla_i,obrazy_parcel_i,RST_KMD_I,hranice_parcel_i,DEF_BUDOVY,RST_KN_I,dalsi_p_mapy_i,prehledka_kat_prac,prehledka_kat_uz,prehledka_kraju-linie&FORMAT=image/png&transparent=TRUE&]]></url>
+    </entry>
+    <!--"false;Czech UHUL:ORTOFOTO;http://geoportal2.uhul.cz/cgi-bin/oprl.asp?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=Ortofoto_cb&STYLES=default&FORMAT=image/jpeg&TRANSPARENT=TRUE&"-->
+    <entry>
+        <name>Czech UHUL:ORTOFOTO</name>
+        <type>wms</type>
+        <url><![CDATA[http://geoportal2.uhul.cz/cgi-bin/oprl.asp?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=Ortofoto_cb&STYLES=default&FORMAT=image/jpeg&TRANSPARENT=TRUE&]]></url>
+    </entry>
+    <!--"false;NPE Maps;http://nick.dev.openstreetmap.org/openpaths/freemap.php?layers=npe&"-->
+    <entry>
+        <name>NPE Maps</name>
+        <type>wms</type>
+        <url><![CDATA[http://nick.dev.openstreetmap.org/openpaths/freemap.php?layers=npe&]]></url>
+    </entry>
+    <!--"false;NPE Maps (Tim);http://dev.openstreetmap.org/~timsc/wms2/map.php?"-->
+    <entry>
+        <name>NPE Maps (Tim)</name>
+        <type>wms</type>
+        <url><![CDATA[http://dev.openstreetmap.org/~timsc/wms2/map.php?]]></url>
+    </entry>
+    <!--"false;7th Series (OS7);http://ooc.openstreetmap.org/wms/map.php?source=os7&"-->
+    <entry>
+        <name>7th Series (OS7)</name>
+        <type>wms</type>
+        <url><![CDATA[http://ooc.openstreetmap.org/wms/map.php?source=os7&]]></url>
+    </entry>
+    <!--"false;MLIT Japan (ORTHO);http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF"-->
+    <entry>
+        <name>MLIT Japan (ORTHO)</name>
+        <type>wms</type>
+        <url><![CDATA[http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF]]></url>
+    </entry>
+    <!--"false;MLIT Japan (ORTHO01);http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO01&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF"-->
+    <entry>
+        <name>MLIT Japan (ORTHO01)</name>
+        <type>wms</type>
+        <url><![CDATA[http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO01&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF]]></url>
+    </entry>
+    <!--"false;MLIT Japan (ORTHO02);http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO02&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF"-->
+    <entry>
+        <name>MLIT Japan (ORTHO02)</name>
+        <type>wms</type>
+        <url><![CDATA[http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO02&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF]]></url>
+    </entry>
+    <!--"false;MLIT Japan (ORTHO03);http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO03&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF"-->
+    <entry>
+        <name>MLIT Japan (ORTHO03)</name>
+        <type>wms</type>
+        <url><![CDATA[http://orthophoto.mlit.go.jp:8888/wms/service/wmsRasterTileMap?VERSION=1.3.0&REQUEST=GetMap&LAYERS=ORTHO03&STYLES=Default&CRS=EPSG:4612&BBOX={s},{w},{n},{e}&WIDTH={width}&HEIGHT={height}&FORMAT=image/png&BGCOLOR=OxFFFFFF]]></url>
+    </entry>
+    <!--"false;Lodi - Italy;http://sit.provincia.lodi.it/mapserver/mapserv.exe?map=ortofoto_wgs84.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=Terraitaly%20Ortofoto%202007&STYLES=%2C%2C&FORMAT=image/png&TRANSPARENT=TRUE&"-->
+    <entry>
+        <name>Lodi - Italy</name>
+        <type>wms</type>
+        <url><![CDATA[http://sit.provincia.lodi.it/mapserver/mapserv.exe?map=ortofoto_wgs84.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG:4326&LAYERS=Terraitaly%20Ortofoto%202007&STYLES=%2C%2C&FORMAT=image/png&TRANSPARENT=TRUE&]]></url>
+    </entry>
+    <!--"false;Sicily - Italy;http://88.53.214.52/sitr/services/WGS84_F33/Ortofoto_ATA20072008_f33/MapServer/WMSServer?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&CRS=CRS:84&LAYERS=0&STYLES=default&FORMAT=image/jpeg&"-->
+    <entry>
+        <name>Sicily - Italy</name>
+        <type>wms</type>
+        <url><![CDATA[http://88.53.214.52/sitr/services/WGS84_F33/Ortofoto_ATA20072008_f33/MapServer/WMSServer?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&CRS=CRS:84&LAYERS=0&STYLES=default&FORMAT=image/jpeg&]]></url>
+    </entry>
+    <!--"false;PCN 2006 - Italy;http://wms.pcn.minambiente.it/cgi-bin/mapserv.exe?map=/ms_ogc/service/ortofoto_colore_06.map&LAYERS=ortofoto_colore_06_32,ortofoto_colore_06_33&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fjpeg&"-->
+    <entry>
+        <name>PCN 2006 - Italy</name>
+        <type>wms</type>
+        <url><![CDATA[http://wms.pcn.minambiente.it/cgi-bin/mapserv.exe?map=/ms_ogc/service/ortofoto_colore_06.map&LAYERS=ortofoto_colore_06_32,ortofoto_colore_06_33&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fjpeg&]]></url>
+    </entry>
     <!--"false;SPOTMaps (France);http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&;http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html"-->
+    <entry>
         <name>SPOTMaps (France)</name>
         <type>wms</type>
         <url><![CDATA[http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&]]></url>
         <eula mandatory='true'><![CDATA[http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html]]></eula>
     </entry>
+    <!--"false;PNOA Spain;http://www.idee.es/wms/PNOA/PNOA?REQUEST=GetMap&VERSION=1.1.1&SERVICE=WMS&SRS=EPSG:4326&LAYERS=pnoa&STYLES=default&FORMAT=image/jpeg&;http://wiki.openstreetmap.org/wiki/Spain_Potential_Datasources#Resumen_WMS"-->
     <entry>
-    <!--"false;OpenPT Map;tms[5,16]:http://openptmap.de/tiles;;45.7,5.9,55.0,17.3;osm;osm;osm"-->
-        <name>OpenPT Map</name>
-        <type>tms</type>
-        <url><![CDATA[http://openptmap.de/tiles]]></url>
-        <min-zoom>5</min-zoom>
-        <max-zoom>16</max-zoom>
-        <bounds min-lat='45.7' min-lon='5.9' max-lat='55.0' max-lon='17.3'/>
-        <osm-attribution mandatory='true'/>
+        <name>PNOA Spain</name>
+        <type>wms</type>
+        <url><![CDATA[http://www.idee.es/wms/PNOA/PNOA?REQUEST=GetMap&VERSION=1.1.1&SERVICE=WMS&SRS=EPSG:4326&LAYERS=pnoa&STYLES=default&FORMAT=image/jpeg&]]></url>
+        <eula mandatory='true'><![CDATA[http://wiki.openstreetmap.org/wiki/Spain_Potential_Datasources#Resumen_WMS]]></eula>
     </entry>
+    <!--"false;Estonia Basemap (Maaamet);http://xgis.maaamet.ee/wms-pub/alus-geo?FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=pohi_vr2&"-->
     <entry>
-    <!--"false;ÖPNV;tms[18]:http://tile.xn-  -pnvkarte-m4a.de/tilegen;;;osm;osm;osm"-->
-        <name>ÖPNV</name>
+        <name>Estonia Basemap (Maaamet)</name>
+        <type>wms</type>
+        <url><![CDATA[http://xgis.maaamet.ee/wms-pub/alus-geo?FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=pohi_vr2&]]></url>
+    </entry>
+    <!--"false;Estonia Ortho (Maaamet);http://xgis.maaamet.ee/wms-pub/alus-geo?VERSION=1.1.1&REQUEST=GetMap&LAYERS=of10000&STYLES=&SRS=EPSG:4326&FORMAT=image/jpeg&"-->
+    <entry>
+        <name>Estonia Ortho (Maaamet)</name>
+        <type>wms</type>
+        <url><![CDATA[http://xgis.maaamet.ee/wms-pub/alus-geo?VERSION=1.1.1&REQUEST=GetMap&LAYERS=of10000&STYLES=&SRS=EPSG:4326&FORMAT=image/jpeg&]]></url>
+    </entry>
+    <!--"false;Estonia Multi (Maaamet);http://xgis.maaamet.ee/wms-pub/alus-geo?STYLES=&SRS=EPSG:4326&FORMAT=image/png&VERSION=1.1.1&REQUEST=GetMap&LAYERS=of10000,BK_MERI_polygo_8478_3,BK_VEEHOIDLA_p_8494_3,BK_VAIKEJARV_p_8493_3,BK_SUURJARV_po_8489_3,BK_SUURJOGI_po,BK_TUHAMAGI_po_8490_3,BK_SOO_polygon_8488_3,BK_SETTEBASSEI_8487_3,BK_PRUGIMAGI_p_8484_3,BK_POLD_polygo_8483_3,BK_TURBAVALI_p_8492_3,BK_METS_polygo_8479_3,BK_MARGALA_pol_8477_3,BK_LENNUVALI_p_8473_3,BK_KIVIMURD_po_8469_3,BK_KAEVANDUS_p_8468_3,BK_HOONESTATUD_8497_3,BK_VEEPIIR_lin_8495_2,BK_KRAAV_line_8472_2,BK_PEAKRAAV_li_8482_2,BK_OJA_line_8481_2,BK_JOEDL10_lin_8467_2,BK_JOEDK10_lin_8465_2,BK_KLINT_line_8470_2,BK_LIIN110_lin_8474_2,BK_LIIN220_lin_8475_2,BK_LIIN330_lin_8476_2,BK_TEXT_S_18_i_8405_1,BK_TEXT_M_10_i_8411_1,BK_TEXT_S_12_i_8409_1,BK_TEXT_S_10_i_8414_1,BK_TEXT_M_6_it_8418_1,BK_TEXT_S_8_it_8417_1,BK_TEXT_M_8_it_8416_1,BK_TEXT_M_10_i_8413_1,meri_8378_3,MapBSR_mais500_8379_3,MapBSR_mais100_8379_3,EHAK_GEN_8380_3,EHAK_GEN_8381_3,EHAK_GEN_8386_3,rannajoon100_l_8383_2,hpInt11,saar100_polyli_8384_3,hpInt12,KUJUNDUSPIIR_G_8374,KUJUNDUSPIIR_G_8365_2,KUJUNDUSPIIR_G_8374_2,rannajoon10_li_8388_2,saar10_polylin_8364_3,KUJUNDUSPIIR_G_8372,KUJUNDUSPIIR_G_8376_2,KUJUNDUSPIIR_G_8372_2,KUJUNDUSPIIR_G_8375_2,KUJUNDUSPIIR_G_8377_2,venepiir_line_8382_2,alevid_1,alevikud_1,linnaosad_1,linnad_1,MaakondNimi_te_8362_1,HaldusNimi_tex_8385_1,KUJUNDUSPIIR_G_6882_2,kylanimed_1,BK_METSATEE_li_8480_2,BK_KOHALIKTEE__8471_2,korvalmaantee,tugimaantee,trassiosa,pohimaantee,raudtee_esmane,BK_RAUDTEE_lin_8485_2,TOPOYKSUS_6569,TOPOYKSUS_7793&"-->
+    <entry>
+        <name>Estonia Ortho (Maaamet)</name>
+        <type>wms</type>
+        <url><![CDATA[http://xgis.maaamet.ee/wms-pub/alus-geo?STYLES=&SRS=EPSG:4326&FORMAT=image/png&VERSION=1.1.1&REQUEST=GetMap&LAYERS=of10000,BK_MERI_polygo_8478_3,BK_VEEHOIDLA_p_8494_3,BK_VAIKEJARV_p_8493_3,BK_SUURJARV_po_8489_3,BK_SUURJOGI_po,BK_TUHAMAGI_po_8490_3,BK_SOO_polygon_8488_3,BK_SETTEBASSEI_8487_3,BK_PRUGIMAGI_p_8484_3,BK_POLD_polygo_8483_3,BK_TURBAVALI_p_8492_3,BK_METS_polygo_8479_3,BK_MARGALA_pol_8477_3,BK_LENNUVALI_p_8473_3,BK_KIVIMURD_po_8469_3,BK_KAEVANDUS_p_8468_3,BK_HOONESTATUD_8497_3,BK_VEEPIIR_lin_8495_2,BK_KRAAV_line_8472_2,BK_PEAKRAAV_li_8482_2,BK_OJA_line_8481_2,BK_JOEDL10_lin_8467_2,BK_JOEDK10_lin_8465_2,BK_KLINT_line_8470_2,BK_LIIN110_lin_8474_2,BK_LIIN220_lin_8475_2,BK_LIIN330_lin_8476_2,BK_TEXT_S_18_i_8405_1,BK_TEXT_M_10_i_8411_1,BK_TEXT_S_12_i_8409_1,BK_TEXT_S_10_i_8414_1,BK_TEXT_M_6_it_8418_1,BK_TEXT_S_8_it_8417_1,BK_TEXT_M_8_it_8416_1,BK_TEXT_M_10_i_8413_1,meri_8378_3,MapBSR_mais500_8379_3,MapBSR_mais100_8379_3,EHAK_GEN_8380_3,EHAK_GEN_8381_3,EHAK_GEN_8386_3,rannajoon100_l_8383_2,hpInt11,saar100_polyli_8384_3,hpInt12,KUJUNDUSPIIR_G_8374,KUJUNDUSPIIR_G_8365_2,KUJUNDUSPIIR_G_8374_2,rannajoon10_li_8388_2,saar10_polylin_8364_3,KUJUNDUSPIIR_G_8372,KUJUNDUSPIIR_G_8376_2,KUJUNDUSPIIR_G_8372_2,KUJUNDUSPIIR_G_8375_2,KUJUNDUSPIIR_G_8377_2,venepiir_line_8382_2,alevid_1,alevikud_1,linnaosad_1,linnad_1,MaakondNimi_te_8362_1,HaldusNimi_tex_8385_1,KUJUNDUSPIIR_G_6882_2,kylanimed_1,BK_METSATEE_li_8480_2,BK_KOHALIKTEE__8471_2,korvalmaantee,tugimaantee,trassiosa,pohimaantee,raudtee_esmane,BK_RAUDTEE_lin_8485_2,TOPOYKSUS_6569,TOPOYKSUS_7793&]]></url>
+    </entry>
+    <!--"false;Fugro (Denmark);tms:http://tile.openstreetmap.dk/fugro2005"-->
+    <entry>
+        <name>Fugro (Denmark)</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.openstreetmap.dk/fugro2005/{zoom}/{x}/{y}.png]]></url>
+    </entry>
+    <!--"false;Stevns (Denmark);tms:http://tile.openstreetmap.dk/stevns/2009"-->
+    <entry>
+        <name>Stevns (Denmark)</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.openstreetmap.dk/stevns/2009/{zoom}/{x}/{y}.png]]></url>
+    </entry>
+    <!--"false;Pangasinan (Phillipines HiRes);tms:http://dev.openstreetmap.org/~gravitystorm/imagery/philippines"-->
+    <entry>
+        <name>Pangasinan (Phillipines HiRes)</name>
+        <type>tms</type>
+        <url><![CDATA[http://dev.openstreetmap.org/~gravitystorm/imagery/philippines]]></url>
+    </entry>
+    <!-- Test attribution features -->
+    <entry>
+        <name>ÖPNV - test</name>
         <type>tms</type>
         <url><![CDATA[http://tile.xn--pnvkarte-m4a.de/tilegen]]></url>
         <max-zoom>18</max-zoom>
-
+        <!-- just for test - we don't really want all this attribution here -->
         <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
         <attribution-url>http://openstreetmap.org/</attribution-url>
         <terms-of-use-text>Background terms of use</terms-of-use-text>
         <terms-of-use-url>http://www.openstreetmap.org/copyright</terms-of-use-url>
-        <!-- just for test - we don't really want a logo in this case -->
         <logo-image>http://wiki.openstreetmap.org/w/images/c/c8/Public-images-osm_logo.png</logo-image>
         <logo-url>http://wiki.openstreetmap.org/</logo-url>
     </entry>
 </imagery>
+

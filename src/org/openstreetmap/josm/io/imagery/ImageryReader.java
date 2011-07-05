@@ -1,10 +1,14 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.io.imagery;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
 import static org.openstreetmap.josm.tools.Utils.equal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +17,13 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.imagery.ImageryInfo;
 import org.openstreetmap.josm.data.imagery.ImageryInfo.ImageryType;
+import org.openstreetmap.josm.io.MirroredInputStream;
 import org.openstreetmap.josm.io.UTFInputStreamReader;
+import org.openstreetmap.josm.tools.Utils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -24,31 +31,141 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class ImageryReader {
 
-    private InputSource inputSource;
-
-    private final static boolean debug = true;
+    private String source;
 
     private enum State { INIT, IMAGERY, ENTRY, ENTRY_ATTRIBUTE }
 
-    public ImageryReader(InputStream source) throws IOException {
-        this.inputSource = new InputSource(UTFInputStreamReader.create(source, "UTF-8"));
+    public ImageryReader(String source) throws IOException {
+        this.source = source;
     }
 
     public List<ImageryInfo> parse() throws SAXException, IOException {
-        Parser parser = new Parser();
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.newSAXParser().parse(inputSource, parser);
-            return parser.entries;
-        } catch (SAXException e) {
-            throw e;
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace(); // broken SAXException chaining
-            throw new SAXException(e);
+        if (isXml(source)) {
+            Parser parser = new Parser();
+            try {
+                SAXParserFactory factory = SAXParserFactory.newInstance();
+                factory.setNamespaceAware(true);
+                InputStream in = new MirroredInputStream(source);
+                InputSource is = new InputSource(UTFInputStreamReader.create(in, "UTF-8"));
+                factory.newSAXParser().parse(is, parser);
+                return parser.entries;
+            } catch (SAXException e) {
+                throw e;
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace(); // broken SAXException chaining
+                throw new SAXException(e);
+            }
+        } else {
+            return readCSV(source);
         }
     }
 
+    /**
+     * Probe the file to see if it is xml or the traditional csv format.
+     * 
+     * If the first non-whitespace character is a '<', decide for
+     * xml, otherwise csv.
+     */
+    private boolean isXml(String source) {
+        MirroredInputStream in = null;
+        try {
+            in = new MirroredInputStream(source);
+            InputStreamReader reader = UTFInputStreamReader.create(in, null);
+            WHILE: while (true) {
+                int c = reader.read();
+                switch (c) {
+                    case -1:
+                        break WHILE;
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\r':
+                        continue;
+                    case '<':
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            Utils.close(in);
+        }
+        System.err.println("Warning: Could not detect type of imagery source '"+source+"'. Using default (xml).");
+        return true;
+    }
+
+    private List<ImageryInfo> readCSV(String source) {
+        List<ImageryInfo> entries = new ArrayList<ImageryInfo>();
+        MirroredInputStream s = null;
+        try {
+            s = new MirroredInputStream(source);
+            try {
+                InputStreamReader r;
+                try
+                {
+                    r = new InputStreamReader(s, "UTF-8");
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    r = new InputStreamReader(s);
+                }
+                BufferedReader reader = new BufferedReader(r);
+                String line;
+                while((line = reader.readLine()) != null)
+                {
+                    String val[] = line.split(";");
+                    if(!line.startsWith("#") && val.length >= 3) {
+                        boolean defaultEntry = "true".equals(val[0]);
+                        String name = tr(val[1]);
+                        String url = val[2];
+                        String eulaAcceptanceRequired = null;
+
+                        if (val.length >= 4 && !val[3].isEmpty()) {
+                            // 4th parameter optional for license agreement (EULA)
+                            eulaAcceptanceRequired = val[3];
+                        }
+
+                        ImageryInfo info = new ImageryInfo(name, url, eulaAcceptanceRequired);
+                        
+                        info.setDefaultEntry(defaultEntry);
+
+                        if (val.length >= 5 && !val[4].isEmpty()) {
+                            // 5th parameter optional for bounds
+                            try {
+                                info.setBounds(new Bounds(val[4], ","));
+                            } catch (IllegalArgumentException e) {
+                                Main.warn(e.toString());
+                            }
+                        }
+                        if (val.length >= 6 && !val[5].isEmpty()) {
+                            info.setAttributionText(val[5]);
+                        }
+                        if (val.length >= 7 && !val[6].isEmpty()) {
+                            info.setAttributionLinkURL(val[6]);
+                        }
+                        if (val.length >= 8 && !val[7].isEmpty()) {
+                            info.setTermsOfUseURL(val[7]);
+                        }
+                        if (val.length >= 9 && !val[8].isEmpty()) {
+                            info.setAttributionImage(val[8]);
+                        }
+
+                        entries.add(info);
+                    }
+                }
+            } finally {
+                Utils.close(s);
+            }
+            return entries;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            Utils.close(s);
+        }
+        return entries;
+    }
 
     private class Parser extends DefaultHandler {
         private StringBuffer accumulator = new StringBuffer();
@@ -85,8 +202,6 @@ public class ImageryReader {
 
         @Override
         public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-            if (debug) System.err.println("<"+qName+">"+(unknownLevel > 0 ? "["+unknownLevel+"]" : ""));
-
             accumulator.setLength(0);
             State newState = null;
             known:{
@@ -163,8 +278,6 @@ public class ImageryReader {
 
         @Override
         public void endElement(String namespaceURI, String qName, String rqName) {
-            if (debug) System.err.println("</"+qName+">"+(unknownLevel > 0 ? "["+unknownLevel+"]" : ""));
-
             if (unknownLevel > 0) {
                 unknownLevel--;
             } else {
