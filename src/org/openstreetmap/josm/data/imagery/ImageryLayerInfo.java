@@ -17,7 +17,10 @@ import java.util.List;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.imagery.ImageryInfo.ImageryType;
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.io.imagery.ImageryReader;
 import org.openstreetmap.josm.io.MirroredInputStream;
+import org.openstreetmap.josm.tools.Utils;
+import org.xml.sax.SAXException;
 
 public class ImageryLayerInfo {
 
@@ -26,7 +29,7 @@ public class ImageryLayerInfo {
     static ArrayList<ImageryInfo> defaultLayers = new ArrayList<ImageryInfo>();
 
     private final static String[] DEFAULT_LAYER_SITES = {
-        "http://josm.openstreetmap.de/maps"
+        "resource://data/imagery.xml" // TODO : create wiki site
     };
 
     private ImageryLayerInfo() {
@@ -62,8 +65,28 @@ public class ImageryLayerInfo {
         Collection<String> defaults = Main.pref.getCollection(
                 "imagery.layers.default", Collections.<String>emptySet());
         ArrayList<String> defaultsSave = new ArrayList<String>();
-        for(String source : Main.pref.getCollection("imagery.layers.sites", Arrays.asList(DEFAULT_LAYER_SITES)))
-        {
+        for (String source : Main.pref.getCollection("imagery.layers.sites", Arrays.asList(DEFAULT_LAYER_SITES))) {
+            if (clearCache) {
+                MirroredInputStream.cleanup(source);
+            }
+            MirroredInputStream stream = null;
+            try {
+                stream = new MirroredInputStream(source, -1);
+                ImageryReader rd = new ImageryReader(stream);
+                Collection<ImageryInfo> result = rd.parse();
+                defaultLayers.addAll(result);
+            } catch (IOException ex) {
+                Utils.close(stream);
+                ex.printStackTrace();
+                continue;
+            } catch (SAXException sex) {
+                Utils.close(stream);
+                sex.printStackTrace();
+                continue;
+            }
+            
+            if (true) continue;
+            
             try
             {
                 if (clearCache) {
@@ -126,7 +149,7 @@ public class ImageryLayerInfo {
                                 if (!defaults.contains(url)) {
                                     for (ImageryInfo i : layers) {
                                         if ((i.getImageryType() == ImageryType.WMS && url.equals(i.getUrl()))
-                                                || url.equals(i.getFullUrl())) {
+                                                || url.equals(i.getExtendedUrl())) {
                                             force = false;
                                         }
                                     }

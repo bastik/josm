@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<imagery>
+    <!--"true;OpenStreetMap (Mapnik);tms[18]:http://tile.openstreetmap.org/;;;osm;osm;osm"-->
+    <entry>
+        <name>Bing</name>
+        <type>bing</type>
+        <default>true</default>
+    </entry>
+    <entry>
+        <name>Landsat</name>
+        <type>wms</type>
+        <default>true</default>
+        <url><![CDATA[http://irs.gis-lab.info/?layers=landsat&]]></url>
+    </entry>
+    <entry>
+        <name>Yahoo Sat</name>
+        <type>html</type>
+        <url><![CDATA[http://josm.openstreetmap.de/wmsplugin/YahooDirect.html?]]></url>
+    </entry>
+    <entry>
+        <name>MapQuest Open Aerial</name>
+        <type>tms</type>
+        <default>true</default>
+        <url><![CDATA[http://oatile1.mqcdn.com/naip/{zoom}/{x}/{y}.png]]></url>
+    </entry>
+    <entry>
+    <!--"false;SPOTMaps (France);http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&;http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html"-->
+        <name>SPOTMaps (France)</name>
+        <type>wms</type>
+        <url><![CDATA[http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&]]></url>
+        <eula mandatory='true'><![CDATA[http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html]]></eula>
+    </entry>
+    <entry>
+    <!--"false;OpenPT Map;tms[5,16]:http://openptmap.de/tiles;;45.7,5.9,55.0,17.3;osm;osm;osm"-->
+        <name>OpenPT Map</name>
+        <type>tms</type>
+        <url><![CDATA[http://openptmap.de/tiles]]></url>
+        <min-zoom>5</min-zoom>
+        <max-zoom>16</max-zoom>
+        <bounds min-lat='45.7' min-lon='5.9' max-lat='55.0' max-lon='17.3'/>
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+    </entry>
+    <entry>
+    <!--"false;ÖPNV;tms[18]:http://tile.xn-  -pnvkarte-m4a.de/tilegen;;;osm;osm;osm"-->
+        <name>ÖPNV</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.xn--pnvkarte-m4a.de/tilegen]]></url>
+        <max-zoom>18</max-zoom>
+
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+        <terms-of-use-text>Background terms of use</terms-of-use-text>
+        <terms-of-use-url>http://www.openstreetmap.org/copyright</terms-of-use-url>
+        <!-- just for test - we don't really want a logo in this case -->
+        <logo-image>http://wiki.openstreetmap.org/w/images/c/c8/Public-images-osm_logo.png</logo-image>
+        <logo-url>http://wiki.openstreetmap.org/</logo-url>
+    </entry>
+</imagery>
+<?xml version="1.0"?>
+<imagery>
+    <!--"true;OpenStreetMap (Mapnik);tms[18]:http://tile.openstreetmap.org/;;;osm;osm;osm"-->
+    <entry>
+        <name>Bing</name>
+        <type>bing</type>
+        <default>true</default>
+    </entry>
+    <entry>
+        <name>Landsat</name>
+        <type>wms</type>
+        <default>true</default>
+        <url><![CDATA[http://irs.gis-lab.info/?layers=landsat&]]></url>
+    </entry>
+    <entry>
+        <name>Yahoo Sat</name>
+        <type>html</type>
+        <url><![CDATA[http://josm.openstreetmap.de/wmsplugin/YahooDirect.html?]]></url>
+    </entry>
+    <entry>
+        <name>MapQuest Open Aerial</name>
+        <type>tms</type>
+        <default>true</default>
+        <url><![CDATA[http://oatile1.mqcdn.com/naip/{zoom}/{x}/{y}.png]]></url>
+    </entry>
+    <entry>
+    <!--"false;SPOTMaps (France);http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&;http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html"-->
+        <name>SPOTMaps (France)</name>
+        <type>wms</type>
+        <url><![CDATA[http://spotmaps.youmapps.org/cgi-bin/mapserv?map=/home/ortho/ortho.map&service=wms&version=1.1.1&srs=EPSG:4326&request=GetMap&layers=spotmaps4osm&format=image/jpeg&FORMAT=image/jpeg&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&Layers=demo&]]></url>
+        <eula mandatory='true'><![CDATA[http://www.youmapps.org/licenses/EULA-OSM-J-{lang}.html]]></eula>
+    </entry>
+    <entry>
+    <!--"false;OpenPT Map;tms[5,16]:http://openptmap.de/tiles;;45.7,5.9,55.0,17.3;osm;osm;osm"-->
+        <name>OpenPT Map</name>
+        <type>tms</type>
+        <url><![CDATA[http://openptmap.de/tiles]]></url>
+        <min-zoom>5</min-zoom>
+        <max-zoom>16</max-zoom>
+        <bounds min-lat='45.7' min-lon='5.9' max-lat='55.0' max-lon='17.3'/>
+        <osm-attribution mandatory='true'/>
+    </entry>
+    <entry>
+    <!--"false;ÖPNV;tms[18]:http://tile.xn-  -pnvkarte-m4a.de/tilegen;;;osm;osm;osm"-->
+        <name>ÖPNV</name>
+        <type>tms</type>
+        <url><![CDATA[http://tile.xn--pnvkarte-m4a.de/tilegen]]></url>
+        <max-zoom>18</max-zoom>
+
+        <attribution-text mandatory='true'>© OpenStreetMap contributors, CC-BY-SA</attribution-text>
+        <attribution-url>http://openstreetmap.org/</attribution-url>
+        <terms-of-use-text>Background terms of use</terms-of-use-text>
+        <terms-of-use-url>http://www.openstreetmap.org/copyright</terms-of-use-url>
+        <!-- just for test - we don't really want a logo in this case -->
+        <logo-image>http://wiki.openstreetmap.org/w/images/c/c8/Public-images-osm_logo.png</logo-image>
+        <logo-url>http://wiki.openstreetmap.org/</logo-url>
+    </entry>
+</imagery>

@@ -695,7 +695,7 @@ public class WMSLayer extends ImageryLayer implements PreferenceChangedListener 
                     oos.writeInt(imageSize);
                     oos.writeDouble(info.getPixelPerDegree());
                     oos.writeObject(info.getName());
-                    oos.writeObject(info.getFullUrl());
+                    oos.writeObject(info.getExtendedUrl());
                     oos.writeObject(images);
                     oos.close();
                 }
@@ -734,7 +734,7 @@ public class WMSLayer extends ImageryLayer implements PreferenceChangedListener 
                 imageSize = ois.readInt();
                 info.setPixelPerDegree(ois.readDouble());
                 doSetName((String)ois.readObject());
-                info.setUrl((String) ois.readObject());
+                info.setExtendedUrl((String) ois.readObject());
                 images = (GeorefImage[][])ois.readObject();
                 ois.close();
                 fis.close();

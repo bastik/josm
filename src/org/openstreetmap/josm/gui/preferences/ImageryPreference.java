@@ -591,7 +591,7 @@ public class ImageryPreference implements PreferenceSetting {
                 case 0:
                     return info.getName();
                 case 1:
-                    return info.getFullUrl();
+                    return info.getExtendedUrl();
                 case 2:
                     return (info.getImageryType() == ImageryType.WMS || info.getImageryType() == ImageryType.HTML) ?
                             (info.getPixelPerDegree() == 0.0 ? "" : info.getPixelPerDegree()) :
@@ -609,7 +609,7 @@ public class ImageryPreference implements PreferenceSetting {
                     info.setName((String) o);
                     break;
                 case 1:
-                    info.setUrl((String)o);
+                    info.setExtendedUrl((String)o);
                     break;
                 case 2:
                     info.setPixelPerDegree(0);
@@ -658,7 +658,7 @@ public class ImageryPreference implements PreferenceSetting {
                 case 0:
                     return info.getName();
                 case 1:
-                    return info.getFullUrl();
+                    return info.getExtendedUrl();
                 }
                 return null;
             }
