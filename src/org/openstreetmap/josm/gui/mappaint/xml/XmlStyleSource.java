@@ -134,7 +134,22 @@ public class XmlStyleSource extends StyleSource implements StyleKeys {
         return false;
     }
 
+    private String returnSecond(String first, String second) {
+        return alwaysTrue() ? second : first;
+    }
+
+    private boolean alwaysTrue() {
+        return true;
+    }
+
     private IconPrototype getNode(OsmPrimitive primitive, Double scale, MultiCascade mc) {
+
+        if (primitive.getId() == 746457511)
+        {
+            String test = returnSecond(null, "second");
+            System.err.println("test: " + test);
+        }
+
         IconPrototype icon = null;
         for (String key : primitive.keySet()) {
             String val = primitive.get(key);
