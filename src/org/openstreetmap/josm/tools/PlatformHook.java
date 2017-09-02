@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -265,7 +266,7 @@ public interface PlatformHook {
     default void checkExpiredJava(JavaExpirationCallback callback) {
         Date expiration = Utils.getJavaExpirationDate();
         if (expiration != null && expiration.before(new Date())) {
-            String version = Utils.getJavaLatestVersion();
+            String version = PlatformHook.getJavaLatestVersion();
             callback.askUpdateJava(version != null ? version : "latest",
                     Main.pref.get("java.update.url", "https://www.java.com/download"),
                     DateUtils.getDateFormat(DateFormat.MEDIUM).format(expiration), false);
@@ -309,5 +310,21 @@ public interface PlatformHook {
      */
     default void setNativeOsCallback(NativeOsCallback callback) {
         // To be implemented if needed
+    }
+
+    /**
+     * Returns the latest version of Java, from Oracle website.
+     * @return the latest version of Java, from Oracle website
+     * @since 12219
+     */
+    public static String getJavaLatestVersion() {
+        try {
+            return HttpClient.create(
+                    new URL(Main.pref.get("java.baseline.version.url", "http://javadl-esd-secure.oracle.com/update/baseline.version")))
+                    .connect().fetchContent().split("\n")[0];
+        } catch (IOException e) {
+            Logging.error(e);
+        }
+        return null;
     }
 }

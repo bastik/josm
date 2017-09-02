@@ -1681,22 +1681,6 @@ public final class Utils {
     }
 
     /**
-     * Returns the latest version of Java, from Oracle website.
-     * @return the latest version of Java, from Oracle website
-     * @since 12219
-     */
-    public static String getJavaLatestVersion() {
-        try {
-            return HttpClient.create(
-                    new URL(Main.pref.get("java.baseline.version.url", "http://javadl-esd-secure.oracle.com/update/baseline.version")))
-                    .connect().fetchContent().split("\n")[0];
-        } catch (IOException e) {
-            Logging.error(e);
-        }
-        return null;
-    }
-
-    /**
      * Get a function that converts an object to a singleton stream of a certain
      * class (or null if the object cannot be cast to that class).
      *
