@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.data.coordinate" default="dist">
+
+    <property name="required-modules">
+        org.openstreetmap.josm.base
+    </property>
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/data/coor/Coordinate.java"/>
+        <include name="org/openstreetmap/josm/data/coor/ILatLon.java"/>
+        <include name="org/openstreetmap/josm/data/coor/LatLon.java"/>
+        <include name="org/openstreetmap/josm/data/coor/EastNorth.java"/>
+        <include name="org/openstreetmap/josm/data/osm/BBox.java"/>
+        <include name="org/openstreetmap/josm/data/Bounds.java"/>
+        <include name="org/openstreetmap/josm/data/ProjectionBounds.java"/>
+    </fileset>
+
+</project>

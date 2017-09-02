@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="josm-plugins" basedir=".">
+
+    <!-- modules in an order respecting dependencies -->
+    <property name="modules">
+        org.openstreetmap.josm.base
+        org.openstreetmap.josm.data.coordinate
+        org.openstreetmap.josm.data.osm
+        org.openstreetmap.josm.mapcss
+        org.openstreetmap.josm.projection
+    </property>
+
+    <loadresource property="modules-build">
+        <propertyresource name="modules"/>
+        <filterchain>
+            <tokenfilter>
+                <filetokenizer/>
+                <trim/>
+                <replaceregex pattern="\s+" replace="," flags="g"/>
+                <replaceregex pattern="(,|$)" replace="/build.xml\1" flags="g"/>
+            </tokenfilter>
+        </filterchain>
+    </loadresource>
+
+    <macrodef name="iterate">
+        <attribute name="target"/>
+        <sequential>
+            <subant target="@{target}" inheritall="true">
+                <filelist dir="." files="${modules-build}"/>
+            </subant>
+        </sequential>
+    </macrodef>
+
+    <target name="clean">
+        <iterate target="clean"/>
+    </target>
+
+    <target name="src">
+        <iterate target="src"/>
+    </target>
+
+    <target name="compile">
+        <iterate target="compile"/>
+    </target>
+
+    <target name="dist">
+        <iterate target="dist"/>
+    </target>
+</project>

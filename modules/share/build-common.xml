@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="module_common" basedir="." xmlns:jacoco="antlib:org.jacoco.ant" xmlns:if="ant:if">
+<!--
+** Template for the build targets common to all modules
+** ====================================================
+**
+** Some properties / filesets are expected to be set/overridden in the importing build.xml (see below).
+**
+** Running ant with environment variable CHEAT set, adds josm-custom.jar to the classpath.
+** This is for testing and lets the build succeed, even if dependencies are missing.
+**
+-->
+    <property name="base.dir" location="${basedir}"/>
+    <property name="src-java.dir" location="${base.dir}/src/main/java"/>
+    <property name="src-resources.dir" location="${base.dir}/src/main/resources"/>
+    <property name="modules-base.dir" location="${base.dir}/.."/>
+    <property name="josm-base.dir" location="${base.dir}/../.."/>
+    <property name="orig-src.dir" location="${josm-base.dir}/src"/>
+    <property name="build.dir" location="${base.dir}/build"/>
+    <property name="dist.dir" location="${base.dir}/dist"/>
+    <property name="javac.compiler" value="com.google.errorprone.ErrorProneAntCompilerAdapter" />
+    <property name="java.lang.version" value="1.8" />
+    <property name="error_prone_ant.jar" location="${josm-base.dir}/tools/error_prone_ant.jar"/>
+    <!-- replace '.' by '-' in the project name -->
+    <loadresource property="project.name.dashes">
+        <propertyresource name="ant.project.name"/>
+        <filterchain>
+            <tokenfilter>
+                <filetokenizer/>
+                <replacestring from="." to="-"/>
+            </tokenfilter>
+        </filterchain>
+    </loadresource>
+    <property name="module.jar" value="${dist.dir}/${project.name.dashes}.jar"/>
+    <property environment="env"/>
+
+    <!-- override in the importing build.xml: -->
+    <fileset id="src-main-java" dir="${orig-src.dir}" includes="nothing"/>
+    <!-- override in the importing build.xml (if needed): -->
+    <fileset id="src-main-resources" dir="${josm-base.dir}/data" includes="nothing"/>
+    <!-- override in the importing build.xml (if needed): -->
+    <property name="required-modules">
+        first.module
+        second.module
+    </property>
+
+    <loadresource property="required-include">
+        <propertyresource name="required-modules"/>
+        <filterchain>
+            <tokenfilter>
+                <filetokenizer/>
+                <trim/>
+                <replaceregex pattern="\s+" replace="," flags="g"/>
+                <replaceregex pattern="(,|$)" replace="/dist/*.jar\1" flags="g"/>
+            </tokenfilter>
+        </filterchain>
+    </loadresource>
+
+    <path id="module.classpath">
+        <pathelement location="${josm-base.dir}/dist/josm-custom.jar" if:set="env.CHEAT"/>
+        <fileset dir="${modules-base.dir}" includes="${required-include}"/>
+    </path>
+
+    <!-- copy source files from the original directory structure -->
+    <target name="src">
+        <copy todir="${src-java.dir}" includeemptydirs="false">
+            <fileset refid="src-main-java"/>
+        </copy>
+        <copy todir="${src-resources.dir}" includeemptydirs="false">
+            <fileset refid="src-main-resources"/>
+        </copy>
+    </target>
+
+    <target name="compile" depends="src">
+        <mkdir dir="${build.dir}"/>
+        <javac compiler="${javac.compiler}" sourcepath="" srcdir="${src-java.dir}"
+            excludes="module-info.java"
+            destdir="${build.dir}" target="${java.lang.version}" source="${java.lang.version}" debug="on" includeantruntime="false" createMissingPackageInfoClass="false" encoding="UTF-8">
+            <compilerclasspath>
+                <pathelement location="${error_prone_ant.jar}"/>
+            </compilerclasspath>
+            <compilerarg value="-Xlint:cast"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:dep-ann"/>
+            <compilerarg value="-Xlint:divzero"/>
+            <compilerarg value="-Xlint:empty"/>
+            <compilerarg value="-Xlint:finally"/>
+            <compilerarg value="-Xlint:overrides"/>
+            <!--<compilerarg value="-Xlint:rawtypes"/>-->
+            <compilerarg value="-Xlint:static"/>
+            <compilerarg value="-Xlint:try"/>
+            <compilerarg value="-Xlint:unchecked"/>
+            <!-- Undocumented argument to ignore "Sun internal proprietary API" warning, see http://stackoverflow.com/a/13862308/2257172 -->
+            <compilerarg value="-XDignore.symbol.file"/>
+            <compilerarg value="-Xep:ReferenceEquality:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:ImmutableEnumChecker:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:FutureReturnValueIgnored:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:FloatingPointLiteralPrecision:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:ShortCircuitBoolean:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:LiteralClassName:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg line="-Xmaxwarns 1000"/>
+            <classpath refid="module.classpath"/>
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+        <delete file="${module.jar}"/>
+        <jar destfile="${module.jar}" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Permissions" value="all-permissions"/>
+                <attribute name="Codebase" value="josm.openstreetmap.de"/>
+            </manifest>
+            <zipfileset dir="src/main/resources" prefix="resources"/>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="${src-java.dir}" includes="**/*" excludes="**/module-info.java"/>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${src-resources.dir}" includes="**/*"/>
+        </delete>
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+</project>

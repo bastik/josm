@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.data.osm" default="dist">
+
+    <property name="required-modules">
+        org.openstreetmap.josm.base
+        org.openstreetmap.josm.data.coordinate
+    </property>
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/data/osm/IPrimitive.java"/>
+        <include name="org/openstreetmap/josm/data/osm/AbstractPrimitive.java"/>
+        <include name="org/openstreetmap/josm/data/osm/OsmPrimitive.java"/>
+        <include name="org/openstreetmap/josm/data/osm/INode.java"/>
+        <include name="org/openstreetmap/josm/data/osm/IWay.java"/>
+        <include name="org/openstreetmap/josm/data/osm/IRelation.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Node.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Way.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Relation.java"/>
+        <include name="org/openstreetmap/josm/data/osm/PrimitiveData.java"/>
+        <include name="org/openstreetmap/josm/data/osm/NodeData.java"/>
+        <include name="org/openstreetmap/josm/data/osm/WayData.java"/>
+        <include name="org/openstreetmap/josm/data/osm/RelationData.java"/>
+        <include name="org/openstreetmap/josm/data/osm/WaySegment.java"/>
+        <include name="org/openstreetmap/josm/data/osm/RelationMember.java"/>
+        <include name="org/openstreetmap/josm/data/osm/RelationMemberData.java"/>
+        <include name="org/openstreetmap/josm/data/osm/PrimitiveId.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Tag.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Tagged.java"/>
+        <include name="org/openstreetmap/josm/data/osm/TagMap.java"/>
+        <include name="org/openstreetmap/josm/data/osm/OsmPrimitiveType.java"/>
+        <include name="org/openstreetmap/josm/data/osm/visitor/PrimitiveVisitor.java"/>
+        <include name="org/openstreetmap/josm/data/osm/visitor/Visitor.java"/>
+    </fileset>
+</project>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.base" default="dist">
+    <!--
+    This module is an umbrella for elementary classes, that many modules depend on.
+
+    It is intended as makeshift solution, so we can focus on more substantial tasks
+    during modularization. Later, it should be revised and possibly split into sub-modules.
+    -->
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/tools/Pair.java"/>
+        <include name="org/openstreetmap/josm/tools/MultiMap.java"/>
+        <include name="org/openstreetmap/josm/tools/Utils.java"/>
+        <include name="org/openstreetmap/josm/tools/Logging.java"/>
+        <include name="org/openstreetmap/josm/tools/I18n.java"/>
+        <include name="org/openstreetmap/josm/tools/CheckParameterUtil.java"/>
+        <include name="org/openstreetmap/josm/tools/JosmRuntimeException.java"/>
+        <include name="org/openstreetmap/josm/tools/CopyList.java"/>
+        <include name="org/openstreetmap/josm/tools/SubclassFilteredCollection.java"/>
+        <include name="org/openstreetmap/josm/tools/LanguageInfo.java"/>
+        <include name="org/openstreetmap/josm/tools/StreamUtils.java"/>
+        <include name="org/openstreetmap/josm/tools/bugreport/BugReport.java"/>
+        <include name="org/openstreetmap/josm/tools/bugreport/ReportedException.java"/>
+    </fileset>
+</project>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.data.projection" default="dist">
+
+    <property name="required-modules">
+        org.openstreetmap.josm.base
+        org.openstreetmap.josm.data.coordinate
+    </property>
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/data/projection/**"/>
+    </fileset>
+
+    <!-- TODO: don't copy the auto-generated file, but the sources and generate it here -->
+    <fileset id="src-main-resources" dir="${josm-base.dir}/data/projection">
+        <include name="custom-epsg"/>
+    </fileset>
+</project>

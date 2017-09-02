@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.data.mapcss" default="dist">
+
+    <property name="required-modules">
+        org.openstreetmap.josm.base
+        org.openstreetmap.josm.data.osm
+    </property>
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/gui/mappaint/*.java"/>
+        <exclude name="org/openstreetmap/josm/gui/mappaint/MapPaintMenu.java"/>
+        <include name="org/openstreetmap/josm/gui/mappaint/mapcss/*.java"/>
+        <!-- TODO: don't copy generated sources, but generate them here -->
+        <include name="org/openstreetmap/josm/gui/mappaint/mapcss/parsergen/*.java"/>
+        <include name="org/openstreetmap/josm/gui/mappaint/styleelement/*.java"/>
+    </fileset>
+
+    <!-- TODO: actual JOSM styles do not really belong in generic mapcss module -->
+    <fileset id="src-main-resources" dir="${josm-base.dir}">
+        <include name="styles/**"/>
+    </fileset>
+
+</project>
