@@ -56,10 +56,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -68,7 +65,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -717,54 +713,6 @@ public final class Utils {
                 return f.apply(l.get(index));
             }
         };
-    }
-
-    /**
-     * Returns a Bzip2 input stream wrapping given input stream.
-     * @param in The raw input stream
-     * @return a Bzip2 input stream wrapping given input stream, or {@code null} if {@code in} is {@code null}
-     * @throws IOException if the given input stream does not contain valid BZ2 header
-     * @since 7867
-     */
-    public static BZip2CompressorInputStream getBZip2InputStream(InputStream in) throws IOException {
-        if (in == null) {
-            return null;
-        }
-        return new BZip2CompressorInputStream(in, /* see #9537 */ true);
-    }
-
-    /**
-     * Returns a Gzip input stream wrapping given input stream.
-     * @param in The raw input stream
-     * @return a Gzip input stream wrapping given input stream, or {@code null} if {@code in} is {@code null}
-     * @throws IOException if an I/O error has occurred
-     * @since 7119
-     */
-    public static GZIPInputStream getGZipInputStream(InputStream in) throws IOException {
-        if (in == null) {
-            return null;
-        }
-        return new GZIPInputStream(in);
-    }
-
-    /**
-     * Returns a Zip input stream wrapping given input stream.
-     * @param in The raw input stream
-     * @return a Zip input stream wrapping given input stream, or {@code null} if {@code in} is {@code null}
-     * @throws IOException if an I/O error has occurred
-     * @since 7119
-     */
-    public static ZipInputStream getZipInputStream(InputStream in) throws IOException {
-        if (in == null) {
-            return null;
-        }
-        ZipInputStream zis = new ZipInputStream(in, StandardCharsets.UTF_8);
-        // Positions the stream at the beginning of first entry
-        ZipEntry ze = zis.getNextEntry();
-        if (ze != null && Logging.isDebugEnabled()) {
-            Logging.debug("Zip entry: {0}", ze.getName());
-        }
-        return zis;
     }
 
     /**
