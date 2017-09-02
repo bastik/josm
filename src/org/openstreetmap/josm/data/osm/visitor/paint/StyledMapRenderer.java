@@ -91,7 +91,12 @@ import org.openstreetmap.josm.tools.bugreport.BugReport;
 public class StyledMapRenderer extends AbstractMapRenderer {
 
     private static final ForkJoinPool THREAD_POOL =
-            Utils.newForkJoinPool("mappaint.StyledMapRenderer.style_creation.numberOfThreads", "styled-map-renderer-%d", Thread.NORM_PRIORITY);
+            Utils.newForkJoinPool(
+                    Main.pref.getInteger(
+                            "mappaint.StyledMapRenderer.style_creation.numberOfThreads",
+                            Runtime.getRuntime().availableProcessors()),
+                    "styled-map-renderer-%d",
+                    Thread.NORM_PRIORITY);
 
     /**
      * This stores a style and a primitive that should be painted with that style.

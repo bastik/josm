@@ -22,6 +22,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.Geometry;
 import org.openstreetmap.josm.tools.Geometry.PolygonIntersection;
@@ -39,7 +40,12 @@ import org.openstreetmap.josm.tools.Utils;
 public class MultipolygonBuilder {
 
     private static final ForkJoinPool THREAD_POOL =
-            Utils.newForkJoinPool("multipolygon_creation.numberOfThreads", "multipolygon-builder-%d", Thread.NORM_PRIORITY);
+            Utils.newForkJoinPool(
+                    Main.pref.getInteger(
+                            "multipolygon_creation.numberOfThreads",
+                            Runtime.getRuntime().availableProcessors()),
+                    "multipolygon-builder-%d",
+                    Thread.NORM_PRIORITY);
 
     /**
      * Helper class to avoid unneeded costly intersection calculations.

@@ -69,7 +69,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.openstreetmap.josm.Main;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1241,13 +1240,13 @@ public final class Utils {
 
     /**
      * Returns a {@link ForkJoinPool} with the parallelism given by the preference key.
-     * @param pref The preference key to determine parallelism
+     * @param noThreads noThreads the number of threads to use
      * @param nameFormat see {@link #newThreadFactory(String, int)}
      * @param threadPriority see {@link #newThreadFactory(String, int)}
      * @return a {@link ForkJoinPool}
+     * @since xxx
      */
-    public static ForkJoinPool newForkJoinPool(String pref, final String nameFormat, final int threadPriority) {
-        int noThreads = Main.pref.getInteger(pref, Runtime.getRuntime().availableProcessors());
+    public static ForkJoinPool newForkJoinPool(int noThreads, final String nameFormat, final int threadPriority) {
         return new ForkJoinPool(noThreads, new ForkJoinPool.ForkJoinWorkerThreadFactory() {
             final AtomicLong count = new AtomicLong(0);
             @Override
