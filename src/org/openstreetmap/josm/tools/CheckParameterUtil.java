@@ -2,7 +2,7 @@
 package org.openstreetmap.josm.tools;
 
 import java.text.MessageFormat;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * This utility class provides a collection of static helper methods for checking
@@ -15,24 +15,45 @@ public final class CheckParameterUtil {
         // Hide default constructor for utils classes
     }
 
-    public static <T> void ensureValid(T obj, String parameterName, Function<T, Boolean> check) {
+    /**
+     * Ensures that a parameter is not null and that a certain condition holds.
+     * @param <T> parameter type
+     * @param obj parameter value
+     * @param parameterName parameter name
+     * @param conditionMsg string, stating the condition
+     * @param condition the condition to check
+     * @throws IllegalArgumentException in case the object is null or the condition
+     * is violated
+     * @since 12713
+     */
+    public static <T> void ensure(T obj, String parameterName, String conditionMsg, Predicate<T> condition) {
         ensureParameterNotNull(obj, parameterName);
-        if (!check.apply(obj))
+        if (!condition.test(obj))
+            throw new IllegalArgumentException(
+                    MessageFormat.format("Parameter value ''{0}'' of type {1} is invalid, violated condition: ''{2}'', got ''{3}''",
+                            parameterName,
+                            obj.getClass().getCanonicalName(),
+                            conditionMsg,
+                            obj));
+    }
+
+    /**
+     * Ensures that a parameter is not null and that a certain condition holds.
+     * @param <T> parameter type
+     * @param obj parameter value
+     * @param parameterName parameter name
+     * @param condition the condition to check
+     * @throws IllegalArgumentException in case the object is null or the condition
+     * is violated
+     * @since 12713
+     */
+    public static <T> void ensure(T obj, String parameterName, Predicate<T> condition) {
+        ensureParameterNotNull(obj, parameterName);
+        if (!condition.test(obj))
             throw new IllegalArgumentException(
                     MessageFormat.format("Parameter value ''{0}'' of type {1} is invalid, got ''{2}''",
                             parameterName,
                             obj.getClass().getCanonicalName(),
-                            obj));
-    }
-
-    public static <T> void ensureValid(T obj, String parameterName, String conditionMsg, Function<T, Boolean> check) {
-        ensureParameterNotNull(obj, parameterName);
-        if (!check.apply(obj))
-            throw new IllegalArgumentException(
-                    MessageFormat.format("Parameter value ''{0}'' of type {1} is invalid, violated condition: ''{2}'', value is: ''{3}''",
-                            parameterName,
-                            obj.getClass().getCanonicalName(),
-                            conditionMsg,
                             obj));
     }
 

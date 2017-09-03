@@ -51,7 +51,7 @@ public class OsmServerBackreferenceReader extends OsmServerReader {
      * @throws IllegalArgumentException if primitive.id &lt;= 0
      */
     public OsmServerBackreferenceReader(OsmPrimitive primitive) {
-        CheckParameterUtil.ensureValid(primitive, "primitive", "id > 0", prim -> prim.getUniqueId() > 0);
+        CheckParameterUtil.ensure(primitive, "primitive", "id > 0", prim -> prim.getUniqueId() > 0);
         this.id = primitive.getId();
         this.primitiveType = OsmPrimitiveType.from(primitive);
         this.readFull = false;

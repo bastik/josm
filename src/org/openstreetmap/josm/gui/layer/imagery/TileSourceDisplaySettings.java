@@ -215,7 +215,7 @@ public class TileSourceDisplaySettings implements SessionAwareReadApply {
     }
 
     private void setDisplacement(EastNorth displacement) {
-        CheckParameterUtil.ensureValid(displacement, "displacement", EastNorth::isValid);
+        CheckParameterUtil.ensure(displacement, "displacement", EastNorth::isValid);
         this.displacement = displacement;
         fireSettingsChange(DISPLACEMENT);
     }
