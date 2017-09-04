@@ -72,7 +72,7 @@ public final class PrimitiveDataPaster extends AbstractOsmDataPaster {
             try {
                 if (data instanceof NodeData) {
                     NodeData nodeData = (NodeData) data;
-                    nodeData.setEastNorth(nodeData.getEastNorth().add(offset));
+                    nodeData.setEastNorth(nodeData.getEastNorth(Main.getProjection()).add(offset));
                 } else if (data instanceof WayData) {
                     updateNodes(newIds.get(OsmPrimitiveType.NODE), data);
                 } else if (data instanceof RelationData) {
@@ -82,7 +82,7 @@ public final class PrimitiveDataPaster extends AbstractOsmDataPaster {
                 throw BugReport.intercept(e).put("data", data);
             }
         }
-        return new AddPrimitivesCommand(bufferCopy, toSelect, layer);
+        return new AddPrimitivesCommand(bufferCopy, toSelect, layer.data);
     }
 
     private static EnumMap<OsmPrimitiveType, Map<Long, Long>> generateNewPrimitives(PrimitiveTransferData pasteBuffer,

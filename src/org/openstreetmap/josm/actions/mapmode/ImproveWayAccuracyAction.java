@@ -398,12 +398,13 @@ public class ImproveWayAccuracyAction extends MapMode implements
             return;
         }
 
+        DataSet ds = getLayerManager().getEditDataSet();
         updateKeyModifiers(e);
         mousePos = e.getPoint();
 
         if (state == State.SELECTING) {
             if (targetWay != null) {
-                getLayerManager().getEditDataSet().setSelected(targetWay.getPrimitiveId());
+                ds.setSelected(targetWay.getPrimitiveId());
                 updateStateByCurrentSelection();
             }
         } else if (state == State.IMPROVING) {
@@ -424,7 +425,7 @@ public class ImproveWayAccuracyAction extends MapMode implements
                 // Creating a new node
                 Node virtualNode = new Node(mv.getEastNorth(mousePos.x,
                         mousePos.y));
-                virtualCmds.add(new AddCommand(virtualNode));
+                virtualCmds.add(new AddCommand(ds, virtualNode));
 
                 // Looking for candidateSegment copies in ways that are
                 // referenced
@@ -487,7 +488,7 @@ public class ImproveWayAccuracyAction extends MapMode implements
                     nodes.remove(candidateNode);
                     newWay.setNodes(nodes);
                     if (nodes.size() < 2) {
-                        final Command deleteCmd = DeleteCommand.delete(getLayerManager().getEditLayer(), Collections.singleton(targetWay), true);
+                        final Command deleteCmd = DeleteCommand.delete(Collections.singleton(targetWay), true);
                         if (deleteCmd != null) {
                             MainApplication.undoRedo.add(deleteCmd);
                         }
@@ -499,7 +500,7 @@ public class ImproveWayAccuracyAction extends MapMode implements
                             tr("Cannot delete node that has tags"),
                             tr("Error"), JOptionPane.ERROR_MESSAGE);
                 } else {
-                    final Command deleteCmd = DeleteCommand.delete(getLayerManager().getEditLayer(), Collections.singleton(candidateNode), true);
+                    final Command deleteCmd = DeleteCommand.delete(Collections.singleton(candidateNode), true);
                     if (deleteCmd != null) {
                         MainApplication.undoRedo.add(deleteCmd);
                     }

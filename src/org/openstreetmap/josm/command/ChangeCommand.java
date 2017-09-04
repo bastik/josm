@@ -29,14 +29,12 @@ public class ChangeCommand extends Command {
     private final OsmPrimitive newOsm;
 
     /**
-     * Constructs a new {@code ChangeCommand} in the context of the current edit layer, if any.
-     * @param osm The existing primitive to modify
+     * Constructs a new {@code ChangeCommand} in the context of {@code osm} data set.
+     * @param osm The existing primitive to modify. It must belong to a data set
      * @param newOsm The new primitive
      */
     public ChangeCommand(OsmPrimitive osm, OsmPrimitive newOsm) {
-        this.osm = osm;
-        this.newOsm = newOsm;
-        sanityChecks();
+        this(osm.getDataSet(), osm, newOsm);
     }
 
     /**
@@ -44,7 +42,9 @@ public class ChangeCommand extends Command {
      * @param layer The data layer
      * @param osm The existing primitive to modify
      * @param newOsm The new primitive
+     * @deprecated to be removed end of 2017. Use {@link #ChangeCommand(DataSet, OsmPrimitive, OsmPrimitive)} instead
      */
+    @Deprecated
     public ChangeCommand(OsmDataLayer layer, OsmPrimitive osm, OsmPrimitive newOsm) {
         super(layer);
         this.osm = osm;
