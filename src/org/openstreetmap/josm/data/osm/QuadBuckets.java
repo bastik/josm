@@ -112,7 +112,7 @@ public class QuadBuckets<T extends OsmPrimitive> implements Collection<T> {
             if (!hasChildren())
                 return this;
             else {
-                byte idx = bbox.getIndex(level);
+                byte idx = getIndex(bbox, level);
                 if (idx == -1)
                     return this;
                 QBLevel<T> child = getChild(idx);
@@ -149,7 +149,7 @@ public class QuadBuckets<T extends OsmPrimitive> implements Collection<T> {
             content = null;
 
             for (T o : tmpcontent) {
-                byte idx = o.getBBox().getIndex(level);
+                byte idx = getIndex(o.getBBox(), level);
                 if (idx == -1) {
                     doAddContent(o);
                 } else {
@@ -272,8 +272,8 @@ public class QuadBuckets<T extends OsmPrimitive> implements Collection<T> {
         void doAdd(T o) {
             if (CONSISTENCY_TESTING) {
                 if (o instanceof Node && !matches(o, this)) {
-                    o.getBBox().getIndex(level);
-                    o.getBBox().getIndex(level - 1);
+                    getIndex(o.getBBox(), level);
+                    getIndex(o.getBBox(), level - 1);
                     abort("\nobject " + o + " does not belong in node at level: " + level + " bbox: " + super.toString());
                 }
             }
@@ -612,5 +612,24 @@ public class QuadBuckets<T extends OsmPrimitive> implements Collection<T> {
             tmp = tmp.parent;
         }
         return ret;
+    }
+
+    private static byte getIndex(BBox bbox, int level) {
+        byte idx1 = QuadTiling.index(bbox.ymin, bbox.xmin, level);
+
+        final byte idx2 = QuadTiling.index(bbox.ymin, bbox.xmax, level);
+        if (idx1 == -1) idx1 = idx2;
+        else if (idx1 != idx2) return -1;
+
+        final byte idx3 = QuadTiling.index(bbox.ymax, bbox.xmin, level);
+        if (idx1 == -1) idx1 = idx3;
+        else if (idx1 != idx3) return -1;
+
+        final byte idx4 = QuadTiling.index(bbox.ymax, bbox.xmax, level);
+        if (idx1 == -1) idx1 = idx4;
+        else if (idx1 != idx4) return -1;
+
+        return idx1;
+
     }
 }

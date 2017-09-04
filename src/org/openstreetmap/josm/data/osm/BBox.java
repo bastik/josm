@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.coor.QuadTiling;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
@@ -80,23 +79,6 @@ public class BBox {
     }
 
     /**
-     * Create BBox for all nodes of the way with known coordinates.
-     * If no node has a known coordinate, an invalid BBox is returned.
-     * @param w the way
-     */
-    public BBox(Way w) {
-        w.getNodes().forEach(this::add);
-    }
-
-    /**
-     * Create BBox for a node. An invalid BBox is returned if the coordinates are not known.
-     * @param n the node
-     */
-    public BBox(Node n) {
-        this((ILatLon) n);
-    }
-
-    /**
      * Create BBox for a given latlon. An invalid BBox is returned if the coordinates are not known.
      * @param ll The lat lon position
      */
@@ -155,13 +137,13 @@ public class BBox {
 
     /**
      * Extends this bbox to include the bbox of the primitive extended by extraSpace.
-     * @param primitive an OSM primitive
+     * @param provider an OSM primitive
      * @param extraSpace the value to extend the primitives bbox. Unit is in LatLon degrees.
      */
-    public void addPrimitive(OsmPrimitive primitive, double extraSpace) {
-        BBox primBbox = primitive.getBBox();
-        add(primBbox.xmin - extraSpace, primBbox.ymin - extraSpace);
-        add(primBbox.xmax + extraSpace, primBbox.ymax + extraSpace);
+    public void addPrimitive(BBoxProvider provider, double extraSpace) {
+        BBox box = provider.getBBox();
+        add(box.xmin - extraSpace, box.ymin - extraSpace);
+        add(box.xmax + extraSpace, box.ymax + extraSpace);
     }
 
     /**
@@ -277,25 +259,6 @@ public class BBox {
      */
     public LatLon getCenter() {
         return new LatLon(ymin + (ymax-ymin)/2.0, xmin + (xmax-xmin)/2.0);
-    }
-
-    byte getIndex(final int level) {
-
-        byte idx1 = QuadTiling.index(ymin, xmin, level);
-
-        final byte idx2 = QuadTiling.index(ymin, xmax, level);
-        if (idx1 == -1) idx1 = idx2;
-        else if (idx1 != idx2) return -1;
-
-        final byte idx3 = QuadTiling.index(ymax, xmin, level);
-        if (idx1 == -1) idx1 = idx3;
-        else if (idx1 != idx3) return -1;
-
-        final byte idx4 = QuadTiling.index(ymax, xmax, level);
-        if (idx1 == -1) idx1 = idx4;
-        else if (idx1 != idx4) return -1;
-
-        return idx1;
     }
 
     /**

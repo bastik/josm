@@ -14,6 +14,7 @@
         <include name="org/openstreetmap/josm/data/coor/EastNorth.java"/>
         <include name="org/openstreetmap/josm/data/coor/LatLonToEastNorthConverter.java"/>
         <include name="org/openstreetmap/josm/data/osm/BBox.java"/>
+        <include name="org/openstreetmap/josm/data/osm/BBoxProvider.java"/>
         <include name="org/openstreetmap/josm/data/Bounds.java"/>
         <include name="org/openstreetmap/josm/data/ProjectionBounds.java"/>
     </fileset>

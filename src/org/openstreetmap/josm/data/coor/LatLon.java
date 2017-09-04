@@ -7,7 +7,6 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
-import static org.openstreetmap.josm.data.projection.Ellipsoid.WGS84;
 import static org.openstreetmap.josm.tools.I18n.trc;
 import static org.openstreetmap.josm.tools.Utils.toRadians;
 
@@ -67,6 +66,9 @@ public class LatLon extends Coordinate implements ILatLon {
     public static final LatLon NORTH_POLE = new LatLon(90, 0);
     /** South pole. */
     public static final LatLon SOUTH_POLE = new LatLon(-90, 0);
+
+    /** half long axis of the WGS84 ellipsoid in meter */
+    private static final double WGS84_A = 6378137.0;
 
     private static DecimalFormat cDmsMinuteFormatter = new DecimalFormat("00");
     private static DecimalFormat cDmsSecondFormatter = new DecimalFormat(
@@ -380,7 +382,7 @@ public class LatLon extends Coordinate implements ILatLon {
     public double greatCircleDistance(LatLon other) {
         double sinHalfLat = sin(toRadians(other.lat() - this.lat()) / 2);
         double sinHalfLon = sin(toRadians(other.lon() - this.lon()) / 2);
-        double d = 2 * WGS84.a * asin(
+        double d = 2 * WGS84_A * asin(
                 sqrt(sinHalfLat*sinHalfLat +
                         cos(toRadians(this.lat()))*cos(toRadians(other.lat()))*sinHalfLon*sinHalfLon));
         // For points opposite to each other on the sphere,
@@ -388,7 +390,7 @@ public class LatLon extends Coordinate implements ILatLon {
         // (This should almost never happen.)
         if (java.lang.Double.isNaN(d)) {
             Logging.error("NaN in greatCircleDistance");
-            d = PI * WGS84.a;
+            d = PI * WGS84_A;
         }
         return d;
     }

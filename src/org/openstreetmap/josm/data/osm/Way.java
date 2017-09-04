@@ -628,9 +628,9 @@ public final class Way extends OsmPrimitive implements IWay {
     @Override
     public BBox getBBox() {
         if (getDataSet() == null)
-            return new BBox(this);
+            return createBBox();
         if (bbox == null) {
-            bbox = new BBox(this);
+            bbox = createBBox();
         }
         return new BBox(bbox);
     }
@@ -642,7 +642,13 @@ public final class Way extends OsmPrimitive implements IWay {
 
     @Override
     public void updatePosition() {
-        bbox = new BBox(this);
+        bbox = createBBox();
+    }
+
+    private BBox createBBox() {
+        BBox bbox = new BBox();
+        this.getNodes().forEach(bbox::add);
+        return bbox;
     }
 
     /**
