@@ -60,10 +60,10 @@ public class CachedLatLon extends LatLon {
      * @return the internally cached east/north coordinates. null, if the globally defined projection is null
      */
     @Override
-    public final EastNorth getEastNorth(Projecting projecting) {
-        if (!Objects.equals(cacheKey, projecting.getCacheKey())) {
-            cacheKey = projecting.getCacheKey();
-            eastNorth = projecting.latlon2eastNorth(this);
+    public final EastNorth getEastNorth(LatLonToEastNorthConverter converter) {
+        if (!Objects.equals(cacheKey, converter.getCacheKey())) {
+            cacheKey = converter.getCacheKey();
+            eastNorth = converter.latlon2eastNorth(this);
         }
         return eastNorth;
     }

@@ -7,6 +7,7 @@ import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.coor.LatLonToEastNorthConverter;
 
 /**
  * Classes implementing this are able to project between screen (east/north) and {@link LatLon} coordinates.
@@ -15,7 +16,7 @@ import org.openstreetmap.josm.data.coor.LatLon;
  * @author Michael Zangl
  * @since 10805
  */
-public interface Projecting {
+public interface Projecting extends LatLonToEastNorthConverter {
 
     /**
      * Convert from lat/lon to easting/northing.
@@ -29,16 +30,6 @@ public interface Projecting {
     default EastNorth latlon2eastNorth(LatLon ll) {
         return latlon2eastNorth((ILatLon) ll);
     }
-
-    /**
-     * Convert from lat/lon to easting/northing. This method uses the newer {@link ILatLon} interface.
-     *
-     * @param ll the geographical point to convert (in WGS84 lat/lon)
-     * @return the corresponding east/north coordinates
-     * @see ILatLon#getEastNorth(Projecting) as shorthand.
-     * @since 12161
-     */
-    EastNorth latlon2eastNorth(ILatLon ll);
 
     /**
      * Convert a east/north coordinate to the {@link LatLon} coordinate.
@@ -70,6 +61,7 @@ public interface Projecting {
      * @return The object to use as cache key
      * @since 10827
      */
+    @Override
     default Object getCacheKey() {
         return this;
     }

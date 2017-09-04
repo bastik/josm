@@ -335,16 +335,6 @@ public class Marker implements TemplateEngineDataProvider, ILatLon {
     }
 
     /**
-     * Returns the marker's projected coordinates.
-     * @return The marker's projected coordinates (easting/northing)
-     * @deprecated use {@link #getEastNorth(org.openstreetmap.josm.data.projection.Projecting)}
-     */
-    @Deprecated
-    public final EastNorth getEastNorth() {
-        return coor.getEastNorth(Main.getProjection());
-    }
-
-    /**
      * Checks whether the marker display area contains the given point.
      * Markers not interested in mouse clicks may always return false.
      *

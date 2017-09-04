@@ -10,8 +10,8 @@ import java.util.Objects;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.coor.LatLonToEastNorthConverter;
 import org.openstreetmap.josm.data.osm.search.SearchCompiler.Match;
-import org.openstreetmap.josm.data.projection.Projecting;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.UncheckedParseException;
 import org.openstreetmap.josm.tools.date.DateUtils;
@@ -108,12 +108,12 @@ public class WayPoint extends WithAttributes implements Comparable<WayPoint>, Te
     }
 
     @Override
-    public final EastNorth getEastNorth(Projecting projecting) {
-        Object newCacheKey = projecting.getCacheKey();
+    public final EastNorth getEastNorth(LatLonToEastNorthConverter converter) {
+        Object newCacheKey = converter.getCacheKey();
         if (Double.isNaN(east) || Double.isNaN(north) || !Objects.equals(newCacheKey, this.eastNorthCacheKey)) {
             // projected coordinates haven't been calculated yet,
             // so fill the cache of the projected waypoint coordinates
-            EastNorth en = projecting.latlon2eastNorth(this);
+            EastNorth en = converter.latlon2eastNorth(this);
             this.east = en.east();
             this.north = en.north();
             this.eastNorthCacheKey = newCacheKey;

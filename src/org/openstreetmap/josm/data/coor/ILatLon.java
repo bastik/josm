@@ -1,9 +1,6 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.data.coor;
 
-import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.projection.Projecting;
-
 /**
  * This interface represents a coordinate in LatLon space.
  * <p>
@@ -38,31 +35,18 @@ public interface ILatLon {
     }
 
     /**
-     * <p>Replies the projected east/north coordinates.</p>
-     *
-     * <p>Uses the {@link Main#getProjection() global projection} to project the lan/lon-coordinates.</p>
-     *
-     * @return the east north coordinates or {@code null} if #is
-     * @deprecated use {@link #getEastNorth(org.openstreetmap.josm.data.projection.Projecting)}
-     */
-    @Deprecated
-    default EastNorth getEastNorth() {
-        return getEastNorth(Main.getProjection());
-    }
-
-    /**
      * Replies the projected east/north coordinates.
      * <p>
      * The result of the last conversion may be cached. Null is returned in case this object is invalid.
-     * @param projecting The projection to use.
+     * @param converter The projection to use.
      * @return The projected east/north coordinates
      * @since 10827
      */
-    default EastNorth getEastNorth(Projecting projecting) {
+    default EastNorth getEastNorth(LatLonToEastNorthConverter converter) {
         if (!isLatLonKnown()) {
             return null;
         } else {
-            return projecting.latlon2eastNorth(this);
+            return converter.latlon2eastNorth(this);
         }
     }
 }
