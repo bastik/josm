@@ -3,6 +3,9 @@ package org.openstreetmap.josm.data.projection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +41,6 @@ import org.openstreetmap.josm.data.projection.proj.ProjFactory;
 import org.openstreetmap.josm.data.projection.proj.Sinusoidal;
 import org.openstreetmap.josm.data.projection.proj.SwissObliqueMercator;
 import org.openstreetmap.josm.data.projection.proj.TransverseMercator;
-import org.openstreetmap.josm.io.CachedFile;
 import org.openstreetmap.josm.tools.JosmRuntimeException;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
@@ -70,6 +72,8 @@ public final class Projections {
             this.definition = definition;
         }
     }
+
+    private static final String EPSG_RESOURCE_PATH = "/data/projection/custom-epsg";
 
     private static final Set<String> allCodes = new HashSet<>();
 
@@ -146,9 +150,16 @@ public final class Projections {
 
         try {
             inits = new LinkedHashMap<>();
-            for (ProjectionDefinition pd : loadProjectionDefinitions("resource://data/projection/custom-epsg")) {
-                inits.put(pd.code, pd);
-                loadNadgrids(pd.definition);
+
+
+            InputStream is = Projections.class.getResourceAsStream("/data/projection/custom-epsg");
+            if (is == null)
+                throw new IOException("Failed to open input stream for resource " + EPSG_RESOURCE_PATH);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                for (ProjectionDefinition pd : loadProjectionDefinitions(reader)) {
+                    inits.put(pd.code, pd);
+                    loadNadgrids(pd.definition);
+                }
             }
         } catch (IOException ex) {
             throw new JosmRuntimeException(ex);
@@ -251,22 +262,6 @@ public final class Projections {
         ProjectionDefinition pd = inits.get(code.toUpperCase(Locale.ENGLISH));
         if (pd == null) return null;
         return pd.definition;
-    }
-
-    /**
-     * Load projection definitions from file.
-     *
-     * @param path the path
-     * @return projection definitions
-     * @throws IOException in case of I/O error
-     */
-    public static List<ProjectionDefinition> loadProjectionDefinitions(String path) throws IOException {
-        try (
-            CachedFile cf = new CachedFile(path);
-            BufferedReader r = cf.getContentReader()
-        ) {
-            return loadProjectionDefinitions(r);
-        }
     }
 
     /**

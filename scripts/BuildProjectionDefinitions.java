@@ -1,8 +1,10 @@
 // License: GPL. For details, see LICENSE file.
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -53,11 +55,13 @@ public class BuildProjectionDefinitions {
     }
 
     static void buildList(String baseDir) throws IOException {
-        List<ProjectionDefinition> pdJosm = Projections.loadProjectionDefinitions(baseDir + File.separator + JOSM_EPSG_FILE);
+        FileReader inJosm = new FileReader(baseDir + File.separator + JOSM_EPSG_FILE);
+        List<ProjectionDefinition> pdJosm = Projections.loadProjectionDefinitions(new BufferedReader(inJosm));
         for (ProjectionDefinition pd : pdJosm) {
             epsgJosm.put(pd.code, pd);
         }
-        List<ProjectionDefinition> pdProj4 = Projections.loadProjectionDefinitions(baseDir + File.separator + PROJ4_EPSG_FILE);
+        FileReader inProj4 = new FileReader(baseDir + File.separator + PROJ4_EPSG_FILE);
+        List<ProjectionDefinition> pdProj4 = Projections.loadProjectionDefinitions(new BufferedReader(inProj4));
         for (ProjectionDefinition pd : pdProj4) {
             epsgProj4.put(pd.code, pd);
         }
