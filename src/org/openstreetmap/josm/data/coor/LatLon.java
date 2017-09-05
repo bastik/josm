@@ -14,7 +14,6 @@ import java.awt.geom.Area;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,7 +22,6 @@ import java.util.regex.Pattern;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.coor.conversion.DecimalDegreesCoordinateFormat;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -347,18 +345,6 @@ public class LatLon extends Coordinate implements ILatLon {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(5);
         return "lat=" + nf.format(lat()) + "\u00B0, lon=" + nf.format(lon()) + '\u00B0';
-    }
-
-    /**
-     * Returns this lat/lon pair in human-readable format separated by {@code separator}.
-     * @param separator values separator
-     * @return String in the format {@code "1.23456[separator]2.34567"}
-     */
-    public String toStringCSV(String separator) {
-        return Utils.join(separator, Arrays.asList(
-                DecimalDegreesCoordinateFormat.INSTANCE.latToString(this),
-                DecimalDegreesCoordinateFormat.INSTANCE.lonToString(this)
-        ));
     }
 
     /**
