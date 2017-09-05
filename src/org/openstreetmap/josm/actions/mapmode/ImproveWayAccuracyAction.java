@@ -409,7 +409,7 @@ public class ImproveWayAccuracyAction extends MapMode implements
             }
         } else if (state == State.IMPROVING) {
             // Checking if the new coordinate is outside of the world
-            if (mv.getLatLon(mousePos.x, mousePos.y).isOutSideWorld()) {
+            if (!Main.getProjection().getWorldBoundsLatLon().contains(mv.getLatLon(mousePos.x, mousePos.y))) {
                 JOptionPane.showMessageDialog(Main.parent,
                         tr("Cannot add a node outside of the world."),
                         tr("Warning"), JOptionPane.WARNING_MESSAGE);

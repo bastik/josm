@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
@@ -226,16 +225,6 @@ public class LatLon extends Coordinate implements ILatLon {
     public boolean equalsEpsilon(LatLon other) {
         double p = MAX_SERVER_PRECISION / 2;
         return Math.abs(lat()-other.lat()) <= p && Math.abs(lon()-other.lon()) <= p;
-    }
-
-    /**
-     * Determines if this lat/lon is outside of the world
-     * @return <code>true</code>, if the coordinate is outside the world, compared by using lat/lon.
-     */
-    public boolean isOutSideWorld() {
-        Bounds b = Main.getProjection().getWorldBoundsLatLon();
-        return lat() < b.getMinLat() || lat() > b.getMaxLat() ||
-                lon() < b.getMinLon() || lon() > b.getMaxLon();
     }
 
     /**

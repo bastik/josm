@@ -477,7 +477,7 @@ public class DrawAction extends MapMode implements MapViewPaintable, DataSelecti
         List<Way> replacedWays = new ArrayList<>();
 
         if (newNode) {
-            if (n.getCoor().isOutSideWorld()) {
+            if (!Main.getProjection().getWorldBoundsLatLon().contains(n)) {
                 JOptionPane.showMessageDialog(
                         Main.parent,
                         tr("Cannot add a node outside of the world."),

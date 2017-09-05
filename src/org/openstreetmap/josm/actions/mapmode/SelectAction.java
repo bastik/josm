@@ -714,7 +714,7 @@ public class SelectAction extends MapMode implements ModifierExListener, KeyPres
                 }
                 for (Node n : affectedNodes) {
                     LatLon ll = n.getCoor();
-                    if (ll != null && ll.isOutSideWorld()) {
+                    if (ll != null && !Main.getProjection().getWorldBoundsLatLon().contains(ll)) {
                         // Revert move
                         ((MoveCommand) c).resetToCheckpoint();
                         // TODO: We might use a simple notification in the lower left corner.
