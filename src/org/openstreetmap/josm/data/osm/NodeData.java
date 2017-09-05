@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.data.osm;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.visitor.PrimitiveVisitor;
@@ -76,7 +77,7 @@ public class NodeData extends PrimitiveData implements INode {
 
     @Override
     public void setEastNorth(EastNorth eastNorth) {
-        setCoor(Projections.inverseProject(eastNorth));
+        setCoor(Main.getProjection().eastNorth2latlon(eastNorth));
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.MoveCommand;
@@ -28,7 +29,6 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
-import org.openstreetmap.josm.data.projection.Projections;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.tools.Geometry;
@@ -140,7 +140,7 @@ public class JoinNodeWayAction extends JosmAction {
                         EastNorth newPosition = Geometry.closestPointToSegment(w.getNode(segmentIndex).getEastNorth(),
                                                                             w.getNode(segmentIndex+1).getEastNorth(),
                                                                             node.getEastNorth());
-                        MoveCommand c = new MoveCommand(node, Projections.inverseProject(newPosition));
+                        MoveCommand c = new MoveCommand(node, Main.getProjection().eastNorth2latlon(newPosition));
                         // Avoid moving a given node several times at the same position in case of overlapping ways
                         if (!cmds.contains(c)) {
                             cmds.add(c);

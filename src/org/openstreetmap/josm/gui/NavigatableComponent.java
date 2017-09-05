@@ -714,7 +714,7 @@ public class NavigatableComponent extends JComponent implements Helpful {
      * @since 12725
      */
     public void zoomTo(ILatLon newCenter) {
-        zoomTo(Projections.project(newCenter));
+        zoomTo(getProjection().latlon2eastNorth(newCenter));
     }
 
     /**

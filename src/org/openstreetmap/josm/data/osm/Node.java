@@ -135,7 +135,7 @@ public final class Node extends OsmPrimitive implements INode {
             this.lon = coor.lon();
             invalidateEastNorthCache();
         } else if (eastNorth != null) {
-            LatLon ll = Projections.inverseProject(eastNorth);
+            LatLon ll = Main.getProjection().eastNorth2latlon(eastNorth);
             this.lat = ll.lat();
             this.lon = ll.lon();
             this.east = eastNorth.east();
