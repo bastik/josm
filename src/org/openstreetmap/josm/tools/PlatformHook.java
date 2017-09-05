@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.projection.datum.NTV2GridShiftFileWrapper;
 import org.openstreetmap.josm.io.CertificateAmendment.CertAmend;
 import org.openstreetmap.josm.tools.date.DateUtils;
 
@@ -27,6 +28,23 @@ import org.openstreetmap.josm.tools.date.DateUtils;
  * @since 1023
  */
 public interface PlatformHook {
+
+    PlatformVisitor<PlatformHook> fromPlatform = new PlatformVisitor<PlatformHook>() {
+        @Override
+        public PlatformHook visitUnixoid() {
+            return new PlatformHookUnixoid();
+        }
+
+        @Override
+        public PlatformHook visitWindows() {
+            return new PlatformHookWindows();
+        }
+
+        @Override
+        public PlatformHook visitOsx() {
+            return new PlatformHookUnixoid();
+        }
+    };
 
     /**
       * The preStartupHook will be called extremly early. It is
@@ -229,7 +247,11 @@ public interface PlatformHook {
      * @return the list of platform-dependent default datum shifting directories for the PROJ.4 library
      * @since 11642
      */
-    List<File> getDefaultProj4NadshiftDirectories();
+    default List<File> getDefaultProj4NadshiftDirectories() {
+        return getPlatform().accept(NTV2GridShiftFileWrapper.defaultProj4NadshiftDirectories);
+    }
+
+    Platform getPlatform();
 
     /**
      * Determines if the JVM is OpenJDK-based.

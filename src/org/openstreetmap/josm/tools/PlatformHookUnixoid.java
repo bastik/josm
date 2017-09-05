@@ -67,6 +67,11 @@ public class PlatformHookUnixoid implements PlatformHook {
     };
 
     @Override
+    public Platform getPlatform() {
+        return Platform.UNIXOID;
+    }
+
+    @Override
     public void preStartupHook() {
         // See #12022 - Disable GNOME ATK Java wrapper as it causes a lot of serious trouble
         if ("org.GNOME.Accessibility.AtkWrapper".equals(System.getProperty("assistive_technologies"))) {
@@ -418,11 +423,6 @@ public class PlatformHookUnixoid implements PlatformHook {
                         ".local" + File.separator + "share" + File.separator + Main.pref.getJOSMDirectoryBaseName());
             }
         }
-    }
-
-    @Override
-    public List<File> getDefaultProj4NadshiftDirectories() {
-        return Arrays.asList(new File("/usr/local/share/proj"), new File("/usr/share/proj"));
     }
 
     @Override

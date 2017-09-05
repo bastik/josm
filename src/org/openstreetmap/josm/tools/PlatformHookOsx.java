@@ -33,6 +33,11 @@ public class PlatformHookOsx implements PlatformHook, InvocationHandler {
     private NativeOsCallback osCallback;
 
     @Override
+    public Platform getPlatform() {
+        return Platform.OSX;
+    }
+
+    @Override
     public void preStartupHook() {
         // This will merge our MenuBar into the system menu.
         // MUST be set before Swing is initialized!
@@ -416,10 +421,5 @@ public class PlatformHookOsx implements PlatformHook, InvocationHandler {
     public File getDefaultUserDataDirectory() {
         return new File(System.getProperty("user.home")+"/Library",
                 Main.pref.getJOSMDirectoryBaseName());
-    }
-
-    @Override
-    public List<File> getDefaultProj4NadshiftDirectories() {
-        return Collections.emptyList();
     }
 }

@@ -158,6 +158,11 @@ public class PlatformHookWindows implements PlatformHook {
     private String oSBuildNumber;
 
     @Override
+    public Platform getPlatform() {
+        return Platform.WINDOWS;
+    }
+
+    @Override
     public void afterPrefStartupHook() {
         extendFontconfig("fontconfig.properties.src");
         // Workaround for JDK-8180379: crash on Windows 10 1703 with Windows L&F and java < 8u152 / 9+171
@@ -671,10 +676,5 @@ public class PlatformHookWindows implements PlatformHook {
         def.add(new FontEntry("arialuni", "Arial Unicode MS", "ARIALUNI.TTF"));
 
         return def;
-    }
-
-    @Override
-    public List<File> getDefaultProj4NadshiftDirectories() {
-        return Arrays.asList(new File("C:\\PROJ\\NAD"));
     }
 }
