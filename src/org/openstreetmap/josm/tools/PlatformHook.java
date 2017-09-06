@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.projection.datum.NTV2GridShiftFileWrapper;
+import org.openstreetmap.josm.data.projection.datum.NTV2Proj4DirGridShiftFileSource;
 import org.openstreetmap.josm.io.CertificateAmendment.CertAmend;
 import org.openstreetmap.josm.tools.date.DateUtils;
 
@@ -248,7 +248,7 @@ public interface PlatformHook {
      * @since 11642
      */
     default List<File> getDefaultProj4NadshiftDirectories() {
-        return getPlatform().accept(NTV2GridShiftFileWrapper.defaultProj4NadshiftDirectories);
+        return getPlatform().accept(NTV2Proj4DirGridShiftFileSource.getInstance());
     }
 
     Platform getPlatform();

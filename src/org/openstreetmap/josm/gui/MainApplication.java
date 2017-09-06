@@ -77,6 +77,9 @@ import org.openstreetmap.josm.data.oauth.OAuthAccessTokenHolder;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.search.SearchMode;
+import org.openstreetmap.josm.data.projection.datum.NTV2GridShiftFileWrapper;
+import org.openstreetmap.josm.data.projection.datum.NTV2JosmWebsiteGridShiftFileSource;
+import org.openstreetmap.josm.data.projection.datum.NTV2Proj4DirGridShiftFileSource;
 import org.openstreetmap.josm.data.validation.OsmValidator;
 import org.openstreetmap.josm.gui.ProgramArguments.Option;
 import org.openstreetmap.josm.gui.SplashScreen.SplashProgressMonitor;
@@ -881,6 +884,12 @@ public class MainApplication extends Main {
         toolbar = new ToolbarPreferences();
         Main.toolbar = toolbar;
         ProjectionPreference.setProjection();
+        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
+                NTV2Proj4DirGridShiftFileSource.getInstance(),
+                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_LOCAL);
+        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
+                NTV2JosmWebsiteGridShiftFileSource.getInstance(),
+                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_DOWNLOAD);
         GuiHelper.translateJavaInternalMessages();
         preConstructorInit();
 
