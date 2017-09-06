@@ -1,14 +1,12 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.tools.bugreport;
 
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import org.openstreetmap.josm.gui.bugreport.BugReportDialog;
 import org.openstreetmap.josm.tools.Logging;
 
 /**
@@ -24,7 +22,7 @@ public class BugReportQueue {
     private boolean suppressAllMessages;
     private final ArrayList<ReportedException> suppressFor = new ArrayList<>();
     private Thread displayThread;
-    private final BiFunction<ReportedException, Integer, SuppressionMode> bugReportHandler = getBestHandler();
+    private BiFunction<ReportedException, Integer, SuppressionMode> bugReportHandler;
     private final CopyOnWriteArrayList<Predicate<ReportedException>> handlers = new CopyOnWriteArrayList<>();
     private int displayedErrors;
 
@@ -126,19 +124,12 @@ public class BugReportQueue {
         return !reportsToDisplay.isEmpty() || inReportDialog;
     }
 
-    private static BiFunction<ReportedException, Integer, SuppressionMode> getBestHandler() {
-        if (GraphicsEnvironment.isHeadless()) {
-            return (e, index) -> {
-                e.printStackTrace();
-                return SuppressionMode.NONE;
-            };
-        } else {
-            return BugReportDialog::showFor;
-        }
+    public void setBugReportHandler(BiFunction<ReportedException, Integer, SuppressionMode> bugReportHandler) {
+        this.bugReportHandler = bugReportHandler;
     }
 
     /**
-     * Allows you to peek or even intersect the bug reports.
+     * Allows you to peek or even intercept the bug reports.
      * @param handler The handler. It can return false to stop all further handling of the exception.
      * @since 10886
      */

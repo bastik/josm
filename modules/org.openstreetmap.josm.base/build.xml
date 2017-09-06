@@ -22,6 +22,7 @@
         <include name="org/openstreetmap/josm/tools/LanguageInfo.java"/>
         <include name="org/openstreetmap/josm/tools/StreamUtils.java"/>
         <include name="org/openstreetmap/josm/tools/bugreport/BugReport.java"/>
+        <include name="org/openstreetmap/josm/tools/bugreport/BugReportQueue.java"/>
         <include name="org/openstreetmap/josm/tools/bugreport/ReportedException.java"/>
         <include name="org/openstreetmap/josm/tools/Platform.java"/>
         <include name="org/openstreetmap/josm/tools/PlatformVisitor.java"/>

@@ -4,6 +4,7 @@ package org.openstreetmap.josm.gui.bugreport;
 import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
+import org.openstreetmap.josm.actions.ShowStatusReportAction;
 
 import org.openstreetmap.josm.gui.datatransfer.ClipboardUtils;
 import org.openstreetmap.josm.gui.widgets.JosmTextArea;
@@ -48,8 +49,8 @@ public class DebugTextDisplay extends JScrollPane {
      */
     public DebugTextDisplay(BugReport report) {
         this();
-        setCodeText(report.getReportText());
-        report.addChangeListener(e -> setCodeText(report.getReportText()));
+        setCodeText(report.getReportText(ShowStatusReportAction.getReportHeader()));
+        report.addChangeListener(e -> setCodeText(report.getReportText(ShowStatusReportAction.getReportHeader())));
     }
 
     /**
