@@ -55,7 +55,7 @@ public class BoundingXYVisitor extends AbstractVisitor {
      */
     public void visit(Bounds b) {
         if (b != null) {
-            b.visitEdge(Main.getProjection(), this::visit);
+            Main.getProjection().traceEdge(b, this::visit);
         }
     }
 

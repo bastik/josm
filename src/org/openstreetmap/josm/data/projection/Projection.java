@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.data.projection;
 
+import java.util.function.Consumer;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.coor.EastNorth;
@@ -120,4 +121,23 @@ public interface Projection extends Projecting {
      * @return true if natural order of coordinates is North East, false if East North
      */
     boolean switchXY();
+
+    /**
+     * Visit points along the edge of this bounds instance.
+     * @param bounds the lat/lon rectangle to trace
+     * @param nPoints number of points to trace along each edge
+     * @param visitor a function to call for the points on the edge.
+     * @since xxx
+     */
+    void traceEdge(Bounds bounds, int nPoints, Consumer<EastNorth> visitor);
+
+    /**
+     * Visit points along the edge of this bounds instance.
+     * @param bounds the lat/lon rectangle to trace
+     * @param visitor a function to call for the points on the edge.
+     * @since xxx
+     */
+    default void traceEdge(Bounds bounds, Consumer<EastNorth> visitor) {
+        traceEdge(bounds, 100, visitor);
+    }
 }

@@ -76,6 +76,13 @@ public class ProjectionBounds {
         this.maxNorth = maxNorth;
     }
 
+    public ProjectionBounds() {
+        this.minEast = Double.POSITIVE_INFINITY;
+        this.minNorth = Double.POSITIVE_INFINITY;
+        this.maxEast = Double.NEGATIVE_INFINITY;
+        this.maxNorth = Double.NEGATIVE_INFINITY;
+    }
+
     /**
      * Extends bounds to include point {@code e}.
      * @param e east/north to include

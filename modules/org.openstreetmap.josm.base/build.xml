@@ -25,5 +25,6 @@
         <include name="org/openstreetmap/josm/tools/bugreport/ReportedException.java"/>
         <include name="org/openstreetmap/josm/tools/Platform.java"/>
         <include name="org/openstreetmap/josm/tools/PlatformVisitor.java"/>
+        <include name="org/openstreetmap/josm/tools/ColorHelper.java"/>
     </fileset>
 </project>

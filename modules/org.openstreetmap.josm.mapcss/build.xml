@@ -4,6 +4,7 @@
     <property name="required-modules">
         org.openstreetmap.josm.base
         org.openstreetmap.josm.data.osm
+        org.openstreetmap.josm.data.coordinate
     </property>
 
     <import file="${basedir}/../share/build-common.xml"/>

@@ -32,5 +32,6 @@
         <include name="org/openstreetmap/josm/data/osm/OsmPrimitiveType.java"/>
         <include name="org/openstreetmap/josm/data/osm/visitor/PrimitiveVisitor.java"/>
         <include name="org/openstreetmap/josm/data/osm/visitor/Visitor.java"/>
+        <include name="org/openstreetmap/josm/data/osm/visitor/AbstractVisitor.java"/>
     </fileset>
 </project>

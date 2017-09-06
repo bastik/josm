@@ -4,6 +4,7 @@ package org.openstreetmap.josm.data.projection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.DoubleUnaryOperator;
 
 import org.openstreetmap.josm.data.Bounds;
@@ -197,30 +198,39 @@ public abstract class AbstractProjection implements Projection {
     }
 
     @Override
+    public void traceEdge(Bounds b, int nPoints, Consumer<EastNorth> visitor) {
+        //TODO: Use projection to see if there is any need for doing this along each axis.
+        double spanLon = b.getMaxLon() - b.getMinLon();
+        double spanLat = b.getMaxLat() - b.getMinLat();
+
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMinLat(), b.getMinLon() + spanLon * step / nPoints)));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMinLat() + spanLat * step / nPoints, b.getMaxLon())));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMaxLat(), b.getMaxLon() - spanLon * step / nPoints)));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMaxLat() - spanLat * step / nPoints, b.getMinLon())));
+        }
+    }
+
+    @Override
     public final ProjectionBounds getWorldBoundsBoxEastNorth() {
         ProjectionBounds result = projectionBoundsBox;
         if (result == null) {
             synchronized (this) {
                 result = projectionBoundsBox;
                 if (result == null) {
-                    Bounds b = getWorldBoundsLatLon();
-                    // add 4 corners
-                    result = new ProjectionBounds(latlon2eastNorth(b.getMin()));
-                    result.extend(latlon2eastNorth(b.getMax()));
-                    result.extend(latlon2eastNorth(new LatLon(b.getMinLat(), b.getMaxLon())));
-                    result.extend(latlon2eastNorth(new LatLon(b.getMaxLat(), b.getMinLon())));
-                    // and trace along the outline
-                    double dLon = (b.getMaxLon() - b.getMinLon()) / 1000;
-                    double dLat = (b.getMaxLat() - b.getMinLat()) / 1000;
-                    for (double lon = b.getMinLon(); lon < b.getMaxLon(); lon += dLon) {
-                        result.extend(latlon2eastNorth(new LatLon(b.getMinLat(), lon)));
-                        result.extend(latlon2eastNorth(new LatLon(b.getMaxLat(), lon)));
-                    }
-                    for (double lat = b.getMinLat(); lat < b.getMaxLat(); lat += dLat) {
-                        result.extend(latlon2eastNorth(new LatLon(lat, b.getMinLon())));
-                        result.extend(latlon2eastNorth(new LatLon(lat, b.getMaxLon())));
-                    }
-                    projectionBoundsBox = result;
+                    ProjectionBounds bds = new ProjectionBounds();
+                    traceEdge(getWorldBoundsLatLon(), 1000, en -> bds.extend(en));
+                    projectionBoundsBox = bds;
                 }
             }
         }
