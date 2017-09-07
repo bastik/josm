@@ -770,7 +770,7 @@ public abstract class Main {
      * @since 1849
      */
     public static void determinePlatformHook() {
-        platform = Platform.determinePlatform().accept(PlatformHook.fromPlatform);
+        platform = Platform.determinePlatform().accept(PlatformHook.CONSTRUCT_FROM_PLATFORM);
     }
 
     /* ----------------------------------------------------------------------------------------- */

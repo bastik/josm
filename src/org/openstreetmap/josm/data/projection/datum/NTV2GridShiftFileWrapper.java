@@ -23,6 +23,24 @@ public class NTV2GridShiftFileWrapper {
     private NTV2GridShiftFile instance;
     private final String gridFileName;
 
+    public static float NTV2_SOURCE_PRIORITY_LOCAL = 10f;
+    public static float NTV2_SOURCE_PRIORITY_DOWNLOAD = 5f;
+
+    private static Map<Float, NTV2GridShiftFileSource> sources =
+            new TreeMap<Float, NTV2GridShiftFileSource>(Collections.reverseOrder());
+
+    /**
+     * Register a source for NTV2 grid files.
+     * @param priority the priority, sources with higher priority are checked first;
+     * use {@link #NTV2_SOURCE_PRIORITY_LOCAL} for local files and
+     * {@link #NTV2_SOURCE_PRIORITY_DOWNLOAD} for remote downloads
+     * @param source the NTV2 grid file source
+     * @since 12777
+     */
+    public static void registerNTV2GridShiftFileSource(float priority, NTV2GridShiftFileSource source) {
+        sources.put(priority, source);
+    }
+
     /**
      * Constructs a new {@code NTV2GridShiftFileWrapper}.
      * @param filename Path to the grid file (GSB format)
@@ -30,34 +48,6 @@ public class NTV2GridShiftFileWrapper {
     public NTV2GridShiftFileWrapper(String filename) {
         this.gridFileName = filename;
     }
-
-    public static float NTV2_SOURCE_PRIORITY_LOCAL = 10f;
-    public static float NTV2_SOURCE_PRIORITY_DOWNLOAD = 5f;
-
-    private static Map<Float, NTV2GridShiftFileSource> sources =
-            new TreeMap<Float, NTV2GridShiftFileSource>(Collections.reverseOrder());
-
-    public static void registerNTV2GridShiftFileSource(NTV2GridShiftFileSource source, float priority) {
-        sources.put(priority, source);
-    }
-
-    public static final PlatformVisitor<List<File>> defaultProj4NadshiftDirectories =
-            new PlatformVisitor<List<File>>() {
-        @Override
-        public List<File> visitUnixoid() {
-            return Arrays.asList(new File("/usr/local/share/proj"), new File("/usr/share/proj"));
-        }
-
-        @Override
-        public List<File> visitWindows() {
-            return Arrays.asList(new File("C:\\PROJ\\NAD"));
-        }
-
-        @Override
-        public List<File> visitOsx() {
-            return Collections.emptyList();
-        }
-    };
 
     /**
      * Returns the actual {@link NTV2GridShiftFile} behind this wrapper.

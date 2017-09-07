@@ -31,7 +31,10 @@ import org.openstreetmap.josm.tools.date.DateUtils;
  */
 public interface PlatformHook {
 
-    PlatformVisitor<PlatformHook> fromPlatform = new PlatformVisitor<PlatformHook>() {
+    /**
+     * Visitor to construct a PlatformHook from a given {@link Platform} object.
+     */
+    public static final PlatformVisitor<PlatformHook> CONSTRUCT_FROM_PLATFORM = new PlatformVisitor<PlatformHook>() {
         @Override
         public PlatformHook visitUnixoid() {
             return new PlatformHookUnixoid();
@@ -47,6 +50,12 @@ public interface PlatformHook {
             return new PlatformHookUnixoid();
         }
     };
+
+    /**
+     * Get the platform corresponding to this platform hook.
+     * @return the platform corresponding to this platform hook
+     */
+    Platform getPlatform();
 
     /**
       * The preStartupHook will be called extremly early. It is
@@ -252,8 +261,6 @@ public interface PlatformHook {
     default List<File> getDefaultProj4NadshiftDirectories() {
         return getPlatform().accept(NTV2Proj4DirGridShiftFileSource.getInstance());
     }
-
-    Platform getPlatform();
 
     /**
      * Determines if the JVM is OpenJDK-based.

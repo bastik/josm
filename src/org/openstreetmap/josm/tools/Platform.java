@@ -4,8 +4,8 @@ package org.openstreetmap.josm.tools;
 import java.util.Locale;
 
 /**
- *
- * @since xxx
+ * Enum listing the supported platforms (operating system families).
+ * @since 12776
  */
 public enum Platform {
 
@@ -28,6 +28,14 @@ public enum Platform {
         }
     };
 
+    private static Platform platform;
+
+    /**
+     * Support for the visitor pattern.
+     * @param <T> type that will be the result of the visiting operation
+     * @param visitor the visitor
+     * @return result of the operation
+     */
     public abstract <T> T accept(PlatformVisitor<T> visitor);
 
     /**
@@ -35,22 +43,25 @@ public enum Platform {
      * @return the the current operating system family
      */
     public static Platform determinePlatform() {
-        String os = System.getProperty("os.name");
-        if (os == null) {
-            Logging.warn("Your operating system has no name, so I'm guessing its some kind of *nix.");
-            return Platform.UNIXOID;
-        } else if (os.toLowerCase(Locale.ENGLISH).startsWith("windows")) {
-            return Platform.WINDOWS;
-        } else if ("Linux".equals(os) || "Solaris".equals(os) ||
-                "SunOS".equals(os) || "AIX".equals(os) ||
-                "FreeBSD".equals(os) || "NetBSD".equals(os) || "OpenBSD".equals(os)) {
-            return Platform.UNIXOID;
-        } else if (os.toLowerCase(Locale.ENGLISH).startsWith("mac os x")) {
-            return Platform.OSX;
-        } else {
-            Logging.warn("I don't know your operating system '"+os+"', so I'm guessing its some kind of *nix.");
-            return Platform.UNIXOID;
+        if (platform == null) {
+            String os = System.getProperty("os.name");
+            if (os == null) {
+                Logging.warn("Your operating system has no name, so I'm guessing its some kind of *nix.");
+                platform = Platform.UNIXOID;
+            } else if (os.toLowerCase(Locale.ENGLISH).startsWith("windows")) {
+                platform = Platform.WINDOWS;
+            } else if ("Linux".equals(os) || "Solaris".equals(os) ||
+                    "SunOS".equals(os) || "AIX".equals(os) ||
+                    "FreeBSD".equals(os) || "NetBSD".equals(os) || "OpenBSD".equals(os)) {
+                platform = Platform.UNIXOID;
+            } else if (os.toLowerCase(Locale.ENGLISH).startsWith("mac os x")) {
+                platform = Platform.OSX;
+            } else {
+                Logging.warn("I don't know your operating system '"+os+"', so I'm guessing its some kind of *nix.");
+                platform = Platform.UNIXOID;
+            }
         }
+        return platform;
     }
 
 }

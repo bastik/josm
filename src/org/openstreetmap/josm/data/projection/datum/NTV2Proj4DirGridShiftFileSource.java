@@ -14,8 +14,8 @@ import org.openstreetmap.josm.tools.Platform;
 import org.openstreetmap.josm.tools.PlatformVisitor;
 
 /**
- *
- * @since xxx
+ * Shift file source that scans the common data directories of the proj4 library.
+ * @since 12777
  */
 public class NTV2Proj4DirGridShiftFileSource implements NTV2GridShiftFileSource, PlatformVisitor<List<File>> {
 
@@ -28,6 +28,10 @@ public class NTV2Proj4DirGridShiftFileSource implements NTV2GridShiftFileSource,
         static final NTV2Proj4DirGridShiftFileSource INSTANCE = new NTV2Proj4DirGridShiftFileSource();
     }
 
+    /**
+     * Get the singleton instance of this class.
+     * @return the singleton instance of this class
+     */
     public static NTV2Proj4DirGridShiftFileSource getInstance() {
         return InstanceHolder.INSTANCE;
     }
