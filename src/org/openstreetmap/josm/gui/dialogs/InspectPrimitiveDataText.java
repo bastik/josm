@@ -206,18 +206,6 @@ public class InspectPrimitiveDataText {
         }
     }
 
-    /**
-     * Returns this lat/lon pair in human-readable format separated by {@code separator}.
-     * @param separator values separator
-     * @return String in the format {@code "1.23456[separator]2.34567"}
-     */
-    private static String toStringCSV(String separator, ILatLon ll) {
-        return Utils.join(separator, Arrays.asList(
-                DecimalDegreesCoordinateFormat.INSTANCE.latToString(ll),
-                DecimalDegreesCoordinateFormat.INSTANCE.lonToString(ll)
-        ));
-    }
-
     void addCoordinates(Node n) {
         if (n.isLatLonKnown()) {
             add(tr("Coordinates: "),
@@ -247,6 +235,19 @@ public class InspectPrimitiveDataText {
             add(tr("In conflict with: "));
             addNameAndId(c.getTheir());
         }
+    }
+
+    /**
+     * Returns lat/lon coordinate in human-readable format separated by {@code separator}.
+     * @param separator values separator
+     * @param ll the lat/lon
+     * @return String in the format {@code "1.23456[separator]2.34567"}
+     */
+    private static String toStringCSV(String separator, ILatLon ll) {
+        return Utils.join(separator, Arrays.asList(
+                DecimalDegreesCoordinateFormat.INSTANCE.latToString(ll),
+                DecimalDegreesCoordinateFormat.INSTANCE.lonToString(ll)
+        ));
     }
 
     @Override

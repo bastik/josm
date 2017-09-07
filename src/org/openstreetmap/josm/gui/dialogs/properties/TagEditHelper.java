@@ -68,9 +68,9 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Tag;
+import org.openstreetmap.josm.data.osm.search.SearchCompiler;
 import org.openstreetmap.josm.data.osm.search.SearchParseError;
 import org.openstreetmap.josm.data.osm.search.SearchSetting;
-import org.openstreetmap.josm.data.osm.search.SearchCompiler;
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.CollectionProperty;
 import org.openstreetmap.josm.data.preferences.EnumProperty;
@@ -445,7 +445,7 @@ public class TagEditHelper {
             JPanel p = new JPanel(new GridBagLayout());
             mainPanel.add(p, BorderLayout.CENTER);
 
-            AutoCompletionManager autocomplete = MainApplication.getLayerManager().getEditLayer().data.getAutoCompletionManager();
+            AutoCompletionManager autocomplete = AutoCompletionManager.of(MainApplication.getLayerManager().getEditLayer().data);
             List<AutoCompletionListItem> keyList = autocomplete.getKeys();
             keyList.sort(DEFAULT_AC_ITEM_COMPARATOR);
 
@@ -691,7 +691,7 @@ public class TagEditHelper {
                 +"<br><br>"+tr("Please select a key")), GBC.eol().fill(GBC.HORIZONTAL));
 
             cacheRecentTags();
-            AutoCompletionManager autocomplete = MainApplication.getLayerManager().getEditLayer().data.getAutoCompletionManager();
+            AutoCompletionManager autocomplete = AutoCompletionManager.of(MainApplication.getLayerManager().getEditLayer().data);
             List<AutoCompletionListItem> keyList = autocomplete.getKeys();
 
             // remove the object's tag keys from the list
@@ -809,7 +809,7 @@ public class TagEditHelper {
 
         @Override
         public void setContentPane(Container contentPane) {
-            final int commandDownMask = GuiHelper.getMenuShortcutKeyMaskEx();
+            final int commandDownMask = Main.platform.getMenuShortcutKeyMaskEx();
             List<String> lines = new ArrayList<>();
             Shortcut.findShortcut(KeyEvent.VK_1, commandDownMask).ifPresent(sc ->
                     lines.add(sc.getKeyText() + ' ' + tr("to apply first suggestion"))

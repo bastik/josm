@@ -7,6 +7,7 @@ import static org.openstreetmap.josm.tools.I18n.trn;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.RepaintManager;
@@ -58,6 +61,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager;
 import org.openstreetmap.gui.jmapviewer.FeatureAdapter;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.actions.DeleteAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.OpenFileAction;
 import org.openstreetmap.josm.actions.OpenFileAction.OpenFileTask;
@@ -69,13 +73,16 @@ import org.openstreetmap.josm.actions.downloadtasks.DownloadTask;
 import org.openstreetmap.josm.actions.downloadtasks.PostDownloadHandler;
 import org.openstreetmap.josm.actions.mapmode.DrawAction;
 import org.openstreetmap.josm.actions.search.SearchAction;
+import org.openstreetmap.josm.command.DeleteCommand;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.UndoRedoHandler.CommandQueueListener;
 import org.openstreetmap.josm.data.Version;
+import org.openstreetmap.josm.data.cache.JCSCacheManager;
 import org.openstreetmap.josm.data.oauth.OAuthAccessTokenHolder;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.UserInfo;
 import org.openstreetmap.josm.data.osm.search.SearchMode;
 import org.openstreetmap.josm.data.projection.datum.NTV2GridShiftFileWrapper;
 import org.openstreetmap.josm.data.projection.datum.NTV2JosmWebsiteGridShiftFileSource;
@@ -107,6 +114,7 @@ import org.openstreetmap.josm.gui.tagging.presets.TaggingPresets;
 import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.gui.util.RedirectInputMap;
 import org.openstreetmap.josm.gui.util.WindowGeometry;
+import org.openstreetmap.josm.gui.widgets.UrlLabel;
 import org.openstreetmap.josm.io.CertificateAmendment;
 import org.openstreetmap.josm.io.DefaultProxySelector;
 import org.openstreetmap.josm.io.MessageNotifier;
@@ -122,6 +130,7 @@ import org.openstreetmap.josm.io.remotecontrol.RemoteControl;
 import org.openstreetmap.josm.plugins.PluginHandler;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.tools.FontsManager;
+import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.HttpClient;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -387,6 +396,7 @@ public class MainApplication extends Main {
     protected void shutdown() {
         if (!GraphicsEnvironment.isHeadless()) {
             worker.shutdown();
+            JCSCacheManager.shutdown();
         }
         if (mainFrame != null) {
             mainFrame.storeState();
@@ -748,12 +758,7 @@ public class MainApplication extends Main {
             return;
         }
 
-        if (GraphicsEnvironment.isHeadless()) {
-            BugReportQueue.getInstance().setBugReportHandler((e, index) -> {
-                    e.printStackTrace();
-                    return BugReportQueue.SuppressionMode.NONE;
-            });
-        } else {
+        if (!GraphicsEnvironment.isHeadless()) {
             BugReportQueue.getInstance().setBugReportHandler(BugReportDialog::showFor);
         }
 
@@ -825,6 +830,8 @@ public class MainApplication extends Main {
 
         Main.platform.afterPrefStartupHook();
 
+        applyWorkarounds();
+
         FontsManager.initialize();
 
         GuiHelper.setupLanguageFonts();
@@ -863,6 +870,8 @@ public class MainApplication extends Main {
         DefaultProxySelector proxySelector = new DefaultProxySelector(ProxySelector.getDefault());
         ProxySelector.setDefault(proxySelector);
         OAuthAccessTokenHolder.getInstance().init(Main.pref, CredentialsManager.getInstance());
+
+        setupCallbacks();
 
         final SplashScreen splash = GuiHelper.runInEDTAndWaitAndReturn(SplashScreen::new);
         final SplashScreen.SplashProgressMonitor monitor = splash.getProgressMonitor();
@@ -954,6 +963,33 @@ public class MainApplication extends Main {
             Logging.info("Enabled EDT checker, wrongful access to gui from non EDT thread will be printed to console");
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
+    }
+
+    static void applyWorkarounds() {
+        // Workaround for JDK-8180379: crash on Windows 10 1703 with Windows L&F and java < 8u141 / 9+172
+        // To remove during Java 9 migration
+        if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows 10") &&
+                platform.getDefaultStyle().equals(LafPreference.LAF.get())) {
+            try {
+                final int currentBuild = Integer.parseInt(PlatformHookWindows.getCurrentBuild());
+                final int javaVersion = Utils.getJavaVersion();
+                final int javaUpdate = Utils.getJavaUpdate();
+                final int javaBuild = Utils.getJavaBuild();
+                // See https://technet.microsoft.com/en-us/windows/release-info.aspx
+                if (currentBuild >= 15_063 && ((javaVersion == 8 && javaUpdate < 141)
+                        || (javaVersion == 9 && javaUpdate == 0 && javaBuild < 173))) {
+                    // Workaround from https://bugs.openjdk.java.net/browse/JDK-8179014
+                    UIManager.put("FileChooser.useSystemExtensionHiding", Boolean.FALSE);
+                }
+            } catch (NumberFormatException | ReflectiveOperationException e) {
+                Logging.error(e);
+            }
+        }
+    }
+
+    static void setupCallbacks() {
+        MessageNotifier.setNotifierCallback(MainApplication::notifyNewMessages);
+        DeleteCommand.setDeletionCallback(DeleteAction.defaultDeletionCallback);
     }
 
     static void setupUIManager() {
@@ -1291,5 +1327,21 @@ public class MainApplication extends Main {
         public void handlePreferences() {
             MainApplication.getMenu().preferences.actionPerformed(null);
         }
+    }
+
+    static void notifyNewMessages(UserInfo userInfo) {
+        GuiHelper.runInEDT(() -> {
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.add(new JLabel(trn("You have {0} unread message.", "You have {0} unread messages.",
+                    userInfo.getUnreadMessages(), userInfo.getUnreadMessages())),
+                    GBC.eol());
+            panel.add(new UrlLabel(Main.getBaseUserUrl() + '/' + userInfo.getDisplayName() + "/inbox",
+                    tr("Click here to see your inbox.")), GBC.eol());
+            panel.setOpaque(false);
+            new Notification().setContent(panel)
+                .setIcon(JOptionPane.INFORMATION_MESSAGE)
+                .setDuration(Notification.TIME_LONG)
+                .show();
+        });
     }
 }

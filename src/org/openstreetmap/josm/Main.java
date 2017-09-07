@@ -31,7 +31,6 @@ import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.cache.JCSCacheManager;
 import org.openstreetmap.josm.data.coor.conversion.CoordinateFormatManager;
 import org.openstreetmap.josm.data.coor.conversion.DecimalDegreesCoordinateFormat;
 import org.openstreetmap.josm.data.coor.conversion.ICoordinateFormat;
@@ -755,7 +754,6 @@ public abstract class Main {
     protected void shutdown() {
         if (!GraphicsEnvironment.isHeadless()) {
             ImageProvider.shutdown(false);
-            JCSCacheManager.shutdown();
         }
         try {
             pref.saveDefaults();

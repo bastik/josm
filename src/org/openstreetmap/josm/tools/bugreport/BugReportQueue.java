@@ -4,7 +4,6 @@ package org.openstreetmap.josm.tools.bugreport;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import org.openstreetmap.josm.tools.Logging;
@@ -18,15 +17,33 @@ public class BugReportQueue {
 
     private static final BugReportQueue INSTANCE = new BugReportQueue();
 
+    public static final BugReportHandler FALLBACK_BUGREPORT_HANDLER = (e, index) -> {
+        e.printStackTrace();
+        return BugReportQueue.SuppressionMode.NONE;
+    };
+
     private final LinkedList<ReportedException> reportsToDisplay = new LinkedList<>();
     private boolean suppressAllMessages;
     private final ArrayList<ReportedException> suppressFor = new ArrayList<>();
     private Thread displayThread;
-    private BiFunction<ReportedException, Integer, SuppressionMode> bugReportHandler;
+    private BugReportHandler bugReportHandler = FALLBACK_BUGREPORT_HANDLER;
     private final CopyOnWriteArrayList<Predicate<ReportedException>> handlers = new CopyOnWriteArrayList<>();
     private int displayedErrors;
 
     private boolean inReportDialog;
+
+    /**
+     * Class that handles reporting a bug to the user.
+     */
+    public interface BugReportHandler {
+        /**
+         * Handle the bug report for a given exception
+         * @param e The exception to display
+         * @param exceptionCounter A counter of how many exceptions have already been worked on
+         * @return The new suppression status
+         */
+        SuppressionMode handle(ReportedException e, int exceptionCounter);
+    }
 
     /**
      * The suppression mode that should be used after the dialog was closed.
@@ -109,7 +126,7 @@ public class BugReportQueue {
             Logging.trace("Intercepted by handler.");
             return SuppressionMode.NONE;
         }
-        return bugReportHandler.apply(e, getDisplayedErrors());
+        return bugReportHandler.handle(e, getDisplayedErrors());
     }
 
     private synchronized int getDisplayedErrors() {
@@ -124,7 +141,7 @@ public class BugReportQueue {
         return !reportsToDisplay.isEmpty() || inReportDialog;
     }
 
-    public void setBugReportHandler(BiFunction<ReportedException, Integer, SuppressionMode> bugReportHandler) {
+    public void setBugReportHandler(BugReportHandler bugReportHandler) {
         this.bugReportHandler = bugReportHandler;
     }
 

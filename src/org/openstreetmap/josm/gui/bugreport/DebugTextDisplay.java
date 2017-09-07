@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import org.openstreetmap.josm.actions.ShowStatusReportAction;
 
+import org.openstreetmap.josm.actions.ShowStatusReportAction;
 import org.openstreetmap.josm.gui.datatransfer.ClipboardUtils;
 import org.openstreetmap.josm.gui.widgets.JosmTextArea;
 import org.openstreetmap.josm.tools.Utils;

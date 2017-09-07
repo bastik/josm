@@ -7,7 +7,6 @@ import java.io.StringWriter;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
-
 /**
  * This class contains utility methods to create and handle a bug report.
  * <p>
@@ -115,6 +114,7 @@ public final class BugReport implements Serializable {
 
     /**
      * Gets the full string that should be send as error report.
+     * @param header header text for the error report
      * @return The string.
      * @since 10585
      */
