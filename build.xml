@@ -342,6 +342,37 @@ Build-Date: ${build.tstamp}
             <fileset dir="resources"/>
         </copy>
     </target>
+    <target name="compile-projection" depends="init">
+        <!-- JOSM -->
+        <javac compiler="${javac.compiler}" srcdir="${src.dir}"
+            includes="org/openstreetmap/josm/data/projection/**"
+            excludes="org/openstreetmap/josm/data/projection/datum/NTV2JosmWebsiteGridShiftFileSource.java"
+            destdir="${build.dir}" target="${java.lang.version}" source="${java.lang.version}" debug="on" includeantruntime="false" createMissingPackageInfoClass="false" encoding="UTF-8">
+            <compilerclasspath>
+                <pathelement location="${error_prone_ant.jar}"/>
+            </compilerclasspath>
+            <compilerarg value="-Xlint:cast"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:dep-ann"/>
+            <compilerarg value="-Xlint:divzero"/>
+            <compilerarg value="-Xlint:empty"/>
+            <compilerarg value="-Xlint:finally"/>
+            <compilerarg value="-Xlint:overrides"/>
+            <!--<compilerarg value="-Xlint:rawtypes"/>-->
+            <compilerarg value="-Xlint:static"/>
+            <compilerarg value="-Xlint:try"/>
+            <compilerarg value="-Xlint:unchecked"/>
+            <!-- Undocumented argument to ignore "Sun internal proprietary API" warning, see http://stackoverflow.com/a/13862308/2257172 -->
+            <compilerarg value="-XDignore.symbol.file"/>
+            <compilerarg value="-Xep:ReferenceEquality:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:ImmutableEnumChecker:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:FutureReturnValueIgnored:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:FloatingPointLiteralPrecision:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:ShortCircuitBoolean:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg value="-Xep:LiteralClassName:OFF" compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"/>
+            <compilerarg line="-Xmaxwarns 1000"/>
+        </javac>
+    </target>
     <target name="init" depends="init-properties">
         <uptodate property="javacc.notRequired" targetfile="${mapcss.dir}/parsergen/MapCSSParser.java" >
             <srcfiles dir="${mapcss.dir}" includes="MapCSSParser.jj"/>
