@@ -52,7 +52,6 @@ import org.openstreetmap.josm.data.preferences.DoubleProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.projection.Projection;
 import org.openstreetmap.josm.data.projection.ProjectionChangeListener;
-import org.openstreetmap.josm.data.projection.Projections;
 import org.openstreetmap.josm.gui.help.Helpful;
 import org.openstreetmap.josm.gui.layer.NativeScaleLayer;
 import org.openstreetmap.josm.gui.layer.NativeScaleLayer.Scale;

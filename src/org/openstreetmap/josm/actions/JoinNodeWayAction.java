@@ -137,10 +137,12 @@ public class JoinNodeWayAction extends JosmAction {
                 final Set<Node> nodesInSegment = innerEntry.get(segmentIndex);
                 if (joinWayToNode) {
                     for (Node node : nodesInSegment) {
-                        EastNorth newPosition = Geometry.closestPointToSegment(w.getNode(segmentIndex).getEastNorth(),
-                                                                            w.getNode(segmentIndex+1).getEastNorth(),
-                                                                            node.getEastNorth());
-                        MoveCommand c = new MoveCommand(node, Main.getProjection().eastNorth2latlon(newPosition));
+                        EastNorth newPosition = Geometry.closestPointToSegment(
+                                w.getNode(segmentIndex).getEastNorth(),
+                                w.getNode(segmentIndex+1).getEastNorth(),
+                                node.getEastNorth());
+                        MoveCommand c = new MoveCommand(
+                                node, Main.getProjection().eastNorth2latlon(newPosition));
                         // Avoid moving a given node several times at the same position in case of overlapping ways
                         if (!cmds.contains(c)) {
                             cmds.add(c);

@@ -9,18 +9,27 @@ import java.util.Locale;
  */
 public enum Platform {
 
+    /**
+     * Unik-like platform. This is the default when the platform cannot be identified.
+     */
     UNIXOID {
         @Override
         public <T> T accept(PlatformVisitor<T> visitor) {
             return visitor.visitUnixoid();
         }
     },
+    /**
+     * Windows platform.
+     */
     WINDOWS {
         @Override
         public <T> T accept(PlatformVisitor<T> visitor) {
             return visitor.visitWindows();
         }
     },
+    /**
+     * macOS (previously OS X) platform.
+     */
     OSX {
         @Override
         public <T> T accept(PlatformVisitor<T> visitor) {
@@ -28,7 +37,7 @@ public enum Platform {
         }
     };
 
-    private static Platform platform;
+    private static volatile Platform platform;
 
     /**
      * Support for the visitor pattern.
