@@ -76,9 +76,7 @@ public final class Projections {
     private static final String EPSG_RESOURCE_PATH = "/data/projection/custom-epsg";
 
     private static final Set<String> allCodes = new HashSet<>();
-
     private static final Map<String, Supplier<Projection>> projectionSuppliersByCode = new HashMap<>();
-
     private static final Map<String, Projection> projectionsByCode_cache = new HashMap<>();
 
     /*********************************
@@ -151,7 +149,6 @@ public final class Projections {
         try {
             inits = new LinkedHashMap<>();
 
-
             InputStream is = Projections.class.getResourceAsStream("/data/projection/custom-epsg");
             if (is == null)
                 throw new IOException("Failed to open input stream for resource " + EPSG_RESOURCE_PATH);
@@ -164,7 +161,6 @@ public final class Projections {
         } catch (IOException ex) {
             throw new JosmRuntimeException(ex);
         }
-
         allCodes.addAll(inits.keySet());
     }
 
@@ -206,6 +202,12 @@ public final class Projections {
         registerBaseProjection(id, new ClassProjFactory(projClass), origin);
     }
 
+    /**
+     * Register a projection supplier, that is, a factory class for projections.
+     * @param code the code of the projection that will be returned
+     * @param supplier a supplier to return a projection with given code
+     * @since 12786
+     */
     public static void registerProjectionSupplier(String code, Supplier<Projection> supplier) {
         projectionSuppliersByCode.put(code, supplier);
         allCodes.add(code);
@@ -308,9 +310,9 @@ public final class Projections {
             proj = new CustomProjection(pd.name, code, pd.definition);
         }
         if (proj == null) {
-            Supplier<Projection> pc = projectionSuppliersByCode.get(code);
-            if (pc != null) {
-                proj = pc.get();
+            Supplier<Projection> ps = projectionSuppliersByCode.get(code);
+            if (ps != null) {
+                proj = ps.get();
             }
         }
         if (proj != null) {
