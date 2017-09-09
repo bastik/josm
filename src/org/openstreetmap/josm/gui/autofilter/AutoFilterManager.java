@@ -196,7 +196,7 @@ implements ZoomChangeListener, MapModeChangeListener, DataSetListener, Preferenc
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         Set<String> values = new TreeSet<>();
         if (ds != null) {
-            BBox bbox = MainApplication.getMap().mapView.getState().getViewArea().getLatLonBoundsBox().toBBox();
+            BBox bbox = new BBox(MainApplication.getMap().mapView.getState().getViewArea().getLatLonBoundsBox());
             Consumer<OsmPrimitive> consumer = getTagValuesConsumer(key, values);
             ds.searchNodes(bbox).forEach(consumer);
             ds.searchWays(bbox).forEach(consumer);

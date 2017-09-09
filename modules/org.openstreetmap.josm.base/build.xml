@@ -10,6 +10,7 @@
     <import file="${basedir}/../share/build-common.xml"/>
 
     <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/CLIModule.java"/>
         <include name="org/openstreetmap/josm/tools/Pair.java"/>
         <include name="org/openstreetmap/josm/tools/MultiMap.java"/>
         <include name="org/openstreetmap/josm/tools/Utils.java"/>

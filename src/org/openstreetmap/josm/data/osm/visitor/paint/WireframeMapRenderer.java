@@ -153,7 +153,7 @@ public class WireframeMapRenderer extends AbstractMapRenderer implements Visitor
 
     @Override
     public void render(DataSet data, boolean virtual, Bounds bounds) {
-        BBox bbox = bounds.toBBox();
+        BBox bbox = new BBox(bounds);
         this.ds = data;
         Rectangle clip = g.getClipBounds();
         clip.grow(50, 50);

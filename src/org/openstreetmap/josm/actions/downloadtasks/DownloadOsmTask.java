@@ -21,6 +21,7 @@ import org.openstreetmap.josm.data.DataSource;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.ViewportData;
 import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -296,7 +297,7 @@ public class DownloadOsmTask extends AbstractDownloadTask<DataSet> {
             if (bounds == null)
                 return Collections.emptySet();
             Collection<OsmPrimitive> col = new ArrayList<>();
-            ds.searchNodes(bounds.toBBox()).stream().filter(n -> !n.isNew() && !dataSet.containsNode(n)).forEachOrdered(col::add);
+            ds.searchNodes(new BBox(bounds)).stream().filter(n -> !n.isNew() && !dataSet.containsNode(n)).forEachOrdered(col::add);
             if (!col.isEmpty()) {
                 Set<Way> ways = new HashSet<>();
                 Set<Relation> rels = new HashSet<>();

@@ -2,6 +2,7 @@
 <project name="org.openstreetmap.josm.data.projection" default="dist">
 
     <property name="required-modules">
+        gnu.getopt.josmlib
         org.openstreetmap.josm.base
         org.openstreetmap.josm.data.coordinate
     </property>
@@ -10,7 +11,6 @@
 
     <fileset id="src-main-java" dir="${orig-src.dir}">
         <include name="org/openstreetmap/josm/data/projection/**"/>
-        <exclude name="org/openstreetmap/josm/data/projection/datum/NTV2JosmWebsiteGridShiftFileSource.java"/>
     </fileset>
 
     <!-- TODO: don't copy the auto-generated file, but the sources and generate it here -->

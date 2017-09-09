@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="gnu.getopt.josmlib" default="dist">
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="gnu/getopt/**"/>
+    </fileset>
+
+</project>

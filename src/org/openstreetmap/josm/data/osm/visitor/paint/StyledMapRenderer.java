@@ -1595,7 +1595,7 @@ public class StyledMapRenderer extends AbstractMapRenderer {
     @Override
     public void render(final DataSet data, boolean renderVirtualNodes, Bounds bounds) {
         RenderBenchmarkCollector benchmark = benchmarkFactory.get();
-        BBox bbox = bounds.toBBox();
+        BBox bbox = new BBox(bounds);
         getSettings(renderVirtualNodes);
 
         try {

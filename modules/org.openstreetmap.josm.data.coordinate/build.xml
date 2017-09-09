@@ -8,15 +8,15 @@
     <import file="${basedir}/../share/build-common.xml"/>
 
     <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/data/Bounds.java"/>
+        <include name="org/openstreetmap/josm/data/ProjectionBounds.java"/>
         <include name="org/openstreetmap/josm/data/coor/Coordinate.java"/>
         <include name="org/openstreetmap/josm/data/coor/ILatLon.java"/>
         <include name="org/openstreetmap/josm/data/coor/LatLon.java"/>
         <include name="org/openstreetmap/josm/data/coor/EastNorth.java"/>
         <include name="org/openstreetmap/josm/data/coor/LatLonToEastNorthConverter.java"/>
-        <include name="org/openstreetmap/josm/data/osm/BBox.java"/>
-        <include name="org/openstreetmap/josm/data/osm/BBoxProvider.java"/>
-        <include name="org/openstreetmap/josm/data/Bounds.java"/>
-        <include name="org/openstreetmap/josm/data/ProjectionBounds.java"/>
+        <include name="org/openstreetmap/josm/data/coor/LatLonToEastNorthConverter.java"/>
+        <include name="org/openstreetmap/josm/data/coor/conversion/LatLonParser.java"/>
     </fileset>
 
 </project>

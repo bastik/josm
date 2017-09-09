@@ -10,7 +10,6 @@ import java.util.Objects;
 
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 
 /**
@@ -18,8 +17,6 @@ import org.openstreetmap.josm.tools.CheckParameterUtil;
  * lat/lon min/max values.  The values are rounded to LatLon.OSM_SERVER_PRECISION
  *
  * @author imi
- *
- * @see BBox to represent invalid areas.
  */
 public class Bounds {
     /**
@@ -330,16 +327,6 @@ public class Bounds {
         this.minLon = LatLon.roundToOsmPrecision(LatLon.toIntervalLon(center.lon() - lonExtent / 2));
         this.maxLat = LatLon.roundToOsmPrecision(LatLon.toIntervalLat(center.lat() + latExtent / 2));
         this.maxLon = LatLon.roundToOsmPrecision(LatLon.toIntervalLon(center.lon() + lonExtent / 2));
-    }
-
-    /**
-     * Creates BBox with same coordinates.
-     *
-     * @return BBox with same coordinates.
-     * @since 6203
-     */
-    public BBox toBBox() {
-        return new BBox(minLon, minLat, maxLon, maxLat);
     }
 
     @Override

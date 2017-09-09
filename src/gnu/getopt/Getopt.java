@@ -20,11 +20,10 @@
 
 package gnu.getopt;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**************************************************************************/
 
@@ -581,28 +580,33 @@ Getopt(String progname, String[] argv, String optstring,
 
 /**************************************************************************/
 
+public void setI18nHandler(Function<String, String> tr) {
+    _messages.tr = tr;
+}
+
 static class OptI18n {
     public  OptI18n() {
-        add("getopt.ambigious", tr("{0}: option ''{1}'' is ambiguous"));
-        add("getopt.arguments1", tr("{0}: option ''--{1}'' does not allow an argument"));
-        add("getopt.arguments2", tr("{0}: option ''{1}{2}'' does not allow an argument"));
-        add("getopt.requires", tr("{0}: option ''{1}'' requires an argument"));
-        add("getopt.unrecognized", tr("{0}: unrecognized option ''--{1}''"));
-        add("getopt.unrecognized2", tr("{0}: unrecognized option ''{1}{2}''"));
-        add("getopt.illegal", tr("{0}: illegal option -- {1}"));
-        add("getopt.invalid", tr("{0}: invalid option -- {1}"));
-        add("getopt.requires2", tr("{0}: option requires an argument -- {1}"));
-        add("getopt.invalidValue", tr("Invalid value {0} for parameter ''has_arg''"));
+        add("getopt.ambigious", "{0}: option ''{1}'' is ambiguous");
+        add("getopt.arguments1", "{0}: option ''--{1}'' does not allow an argument");
+        add("getopt.arguments2", "{0}: option ''{1}{2}'' does not allow an argument");
+        add("getopt.requires", "{0}: option ''{1}'' requires an argument");
+        add("getopt.unrecognized", "{0}: unrecognized option ''--{1}''");
+        add("getopt.unrecognized2", "{0}: unrecognized option ''{1}{2}''");
+        add("getopt.illegal", "{0}: illegal option -- {1}");
+        add("getopt.invalid", "{0}: invalid option -- {1}");
+        add("getopt.requires2", "{0}: option requires an argument -- {1}");
+        add("getopt.invalidValue", "Invalid value {0} for parameter ''has_arg''");
     }
 
-    Map<String, String> trns = new HashMap<String, String>();
+    Function<String, String> tr = Function.identity();
+    Map<String, String> msgs = new HashMap<String, String>();
 
     private void add(String key, String value) {
-        trns.put(key, value);
+        msgs.put(key, value);
     }
 
     public String getString(String s) {
-        String val = trns.get(s);
+        String val = tr.apply(msgs.get(s));
         if (val == null) throw new IllegalArgumentException();
         return val.replace("'", "''");
     }

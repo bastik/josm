@@ -86,6 +86,14 @@ public class BBox {
         add(ll);
     }
 
+    public BBox(Bounds bounds) {
+        if (bounds.crosses180thMeridian())
+            throw new IllegalArgumentException("cannot convert bounds that crosses 180th meridian");
+        this.xmin = bounds.getMinLon();
+        this.xmax = bounds.getMaxLon();
+        this.ymin = bounds.getMinLat();
+        this.ymax = bounds.getMaxLat();
+    }
     /**
      * Add a point to an existing BBox. Extends this bbox if necessary so that this.bounds(c) will return true
      * if c is a valid LatLon instance.

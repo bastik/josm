@@ -1,6 +1,8 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.gui;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import org.openstreetmap.josm.tools.Logging;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
+import org.openstreetmap.josm.tools.I18n;
 
 /**
  * This class holds the arguments passed on to {@link MainApplication#main}.
@@ -115,6 +118,7 @@ public class ProgramArguments {
         LongOpt[] los = Stream.of(Option.values()).map(Option::toLongOpt).toArray(LongOpt[]::new);
 
         Getopt g = new Getopt("JOSM", args, "hv", los);
+        g.setI18nHandler(I18n::tr);
 
         int c;
         while ((c = g.getopt()) != -1) {
@@ -135,7 +139,7 @@ public class ProgramArguments {
             if (opt != null) {
                 addOption(opt, g.getOptarg());
             } else
-                throw new IllegalArgumentException("Invalid option: "+ (char) c);
+                throw new IllegalArgumentException(tr("Invalid option: ''{0}''", (char) c));
         }
         // positional arguments are a shortcut for the --download ... option
         for (int i = g.getOptind(); i < args.length; ++i) {
