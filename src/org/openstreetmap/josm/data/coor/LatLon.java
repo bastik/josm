@@ -7,7 +7,6 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
-import static org.openstreetmap.josm.tools.I18n.trc;
 import static org.openstreetmap.josm.tools.Utils.toRadians;
 
 import java.awt.geom.Area;
@@ -17,7 +16,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.coor.conversion.LatLonParser;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -81,31 +79,6 @@ public class LatLon extends Coordinate implements ILatLon {
         cDdHighPecisionFormatter = (DecimalFormat) NumberFormat.getInstance(Locale.UK);
         cDdHighPecisionFormatter.applyPattern("###0.0##########");
     }
-
-    /**
-     * Character denoting South, as string.
-     * @deprecated use {@link LatLonParser#SOUTH}
-     */
-    @Deprecated
-    public static final String SOUTH = trc("compass", "S");
-    /**
-     * Character denoting North, as string.
-     * @deprecated use {@link LatLonParser#NORTH}
-     */
-    @Deprecated
-    public static final String NORTH = trc("compass", "N");
-    /**
-     * Character denoting West, as string.
-     * @deprecated use {@link LatLonParser#WEST}
-     */
-    @Deprecated
-    public static final String WEST = trc("compass", "W");
-    /**
-     * Character denoting East, as string.
-     * @deprecated use {@link LatLonParser#EAST}
-     */
-    @Deprecated
-    public static final String EAST = trc("compass", "E");
 
     /**
      * Replies true if lat is in the range [-90,90]
@@ -409,17 +382,5 @@ public class LatLon extends Coordinate implements ILatLon {
         LatLon that = (LatLon) obj;
         return Double.compare(that.x, x) == 0 &&
                Double.compare(that.y, y) == 0;
-    }
-
-    /**
-     * Parses the given string as lat/lon.
-     * @param coord String to parse
-     * @return parsed lat/lon
-     * @since 11045
-     * @deprecated use {@link LatLonParser#parse(java.lang.String)}
-     */
-    @Deprecated
-    public static LatLon parse(String coord) {
-        return LatLonParser.parse(coord);
     }
 }
