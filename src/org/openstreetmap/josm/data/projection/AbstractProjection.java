@@ -147,7 +147,7 @@ public abstract class AbstractProjection implements Projection {
     public Map<ProjectionBounds, Projecting> getProjectingsForArea(ProjectionBounds area) {
         if (proj.lonIsLinearToEast()) {
             //FIXME: Respect datum?
-            // wrap the wrold around
+            // wrap the world around
             Bounds bounds = getWorldBoundsLatLon();
             double minEast = latlon2eastNorth(bounds.getMin()).east();
             double maxEast = latlon2eastNorth(bounds.getMax()).east();
@@ -198,30 +198,6 @@ public abstract class AbstractProjection implements Projection {
     }
 
     @Override
-    public void traceEdge(Bounds b, int nPoints, Consumer<EastNorth> visitor) {
-        //TODO: Use projection to see if there is any need for doing this along each axis.
-        double spanLon = b.getMaxLon() - b.getMinLon();
-        double spanLat = b.getMaxLat() - b.getMinLat();
-
-        for (int step = 0; step < nPoints; step++) {
-            visitor.accept(latlon2eastNorth(
-                    new LatLon(b.getMinLat(), b.getMinLon() + spanLon * step / nPoints)));
-        }
-        for (int step = 0; step < nPoints; step++) {
-            visitor.accept(latlon2eastNorth(
-                    new LatLon(b.getMinLat() + spanLat * step / nPoints, b.getMaxLon())));
-        }
-        for (int step = 0; step < nPoints; step++) {
-            visitor.accept(latlon2eastNorth(
-                    new LatLon(b.getMaxLat(), b.getMaxLon() - spanLon * step / nPoints)));
-        }
-        for (int step = 0; step < nPoints; step++) {
-            visitor.accept(latlon2eastNorth(
-                    new LatLon(b.getMaxLat() - spanLat * step / nPoints, b.getMinLon())));
-        }
-    }
-
-    @Override
     public final ProjectionBounds getWorldBoundsBoxEastNorth() {
         ProjectionBounds result = projectionBoundsBox;
         if (result == null) {
@@ -229,7 +205,7 @@ public abstract class AbstractProjection implements Projection {
                 result = projectionBoundsBox;
                 if (result == null) {
                     ProjectionBounds bds = new ProjectionBounds();
-                    traceEdge(getWorldBoundsLatLon(), 1000, en -> bds.extend(en));
+                    visitOutline(getWorldBoundsLatLon(), 1000, bds::extend);
                     projectionBoundsBox = bds;
                 }
             }
@@ -240,5 +216,37 @@ public abstract class AbstractProjection implements Projection {
     @Override
     public Projection getBaseProjection() {
         return this;
+    }
+
+    @Override
+    public void visitOutline(Bounds b, Consumer<EastNorth> visitor) {
+        visitOutline(b, 100, visitor);
+    }
+
+    private void visitOutline(Bounds b, int nPoints, Consumer<EastNorth> visitor) {
+        double maxlon = b.getMaxLon();
+        if (b.crosses180thMeridian()) {
+            maxlon += 360.0;
+        }
+        double spanLon = maxlon - b.getMinLon();
+        double spanLat = b.getMaxLat() - b.getMinLat();
+
+        //TODO: Use projection to see if there is any need for doing this along each axis.
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMinLat(), b.getMinLon() + spanLon * step / nPoints)));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMinLat() + spanLat * step / nPoints, maxlon)));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMaxLat(), maxlon - spanLon * step / nPoints)));
+        }
+        for (int step = 0; step < nPoints; step++) {
+            visitor.accept(latlon2eastNorth(
+                    new LatLon(b.getMaxLat() - spanLat * step / nPoints, b.getMinLon())));
+        }
     }
 }

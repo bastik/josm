@@ -2,6 +2,7 @@
 package org.openstreetmap.josm.data.projection;
 
 import java.util.function.Consumer;
+
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.coor.EastNorth;
@@ -124,20 +125,12 @@ public interface Projection extends Projecting {
 
     /**
      * Visit points along the edge of this bounds instance.
-     * @param bounds the lat/lon rectangle to trace
-     * @param nPoints number of points to trace along each edge
-     * @param visitor a function to call for the points on the edge.
-     * @since xxx
-     */
-    void traceEdge(Bounds bounds, int nPoints, Consumer<EastNorth> visitor);
-
-    /**
-     * Visit points along the edge of this bounds instance.
+     * <p>
+     * Depending on the shape in east/north space, it may simply visit the 4 corners
+     * or (more generally) several points along the curved edges.
      * @param bounds the lat/lon rectangle to trace
      * @param visitor a function to call for the points on the edge.
-     * @since xxx
+     * @since 12818
      */
-    default void traceEdge(Bounds bounds, Consumer<EastNorth> visitor) {
-        traceEdge(bounds, 100, visitor);
-    }
+    void visitOutline(Bounds bounds, Consumer<EastNorth> visitor);
 }

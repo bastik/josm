@@ -301,7 +301,7 @@ public final class MapViewState implements Serializable {
      */
     public Area getArea(Bounds bounds) {
         Path2D area = new Path2D.Double();
-        getProjection().traceEdge(bounds, en -> {
+        getProjection().visitOutline(bounds, en -> {
             MapViewPoint point = getPointFor(en);
             if (area.getCurrentPoint() == null) {
                 area.moveTo(point.getInViewX(), point.getInViewY());
