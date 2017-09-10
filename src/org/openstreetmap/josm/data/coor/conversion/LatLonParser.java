@@ -16,7 +16,7 @@ import org.openstreetmap.josm.data.coor.LatLon;
  * Support for parsing a {@link LatLon} object from a string.
  * @since 12792
  */
-public class LatLonParser {
+public final class LatLonParser {
 
     /** Character denoting South, as string */
     public static final String SOUTH = trc("compass", "S");
@@ -53,6 +53,10 @@ public class LatLonParser {
     private static class LatLonHolder {
         private double lat = Double.NaN;
         private double lon = Double.NaN;
+    }
+
+    private LatLonParser() {
+        // private constructor
     }
 
     /**

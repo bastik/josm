@@ -27,7 +27,7 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.data.osm.visitor.AbstractVisitor;
+import org.openstreetmap.josm.data.osm.visitor.OsmPrimitiveVisitor;
 import org.openstreetmap.josm.data.projection.Projection;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.mappaint.ElemStyles;
@@ -42,7 +42,7 @@ import org.openstreetmap.josm.tools.Pair;
  */
 public class GeoJSONWriter {
 
-    private final OsmDataLayer layer;
+    private final DataSet data;
     private final Projection projection;
     private static final boolean SKIP_EMPTY_NODES = true;
 
@@ -50,9 +50,20 @@ public class GeoJSONWriter {
      * Constructs a new {@code GeoJSONWriter}.
      * @param layer The OSM data layer to save
      * @since 10852
+     * @deprecated To be removed end of 2017. Use {@link #GeoJSONWriter(DataSet)} instead
      */
+    @Deprecated
     public GeoJSONWriter(OsmDataLayer layer) {
-        this.layer = layer;
+        this(layer.data);
+    }
+
+    /**
+     * Constructs a new {@code GeoJSONWriter}.
+     * @param ds The OSM data set to save
+     * @since 12806
+     */
+    public GeoJSONWriter(DataSet ds) {
+        this.data = ds;
         this.projection = ProjectionPreference.wgs84.getProjection();
     }
 
@@ -78,14 +89,14 @@ public class GeoJSONWriter {
             JsonObjectBuilder object = Json.createObjectBuilder()
                     .add("type", "FeatureCollection")
                     .add("generator", "JOSM");
-            appendLayerBounds(layer.data, object);
-            appendLayerFeatures(layer.data, object);
+            appendLayerBounds(data, object);
+            appendLayerFeatures(data, object);
             writer.writeObject(object.build());
             return stringWriter.toString();
         }
     }
 
-    private class GeometryPrimitiveVisitor extends AbstractVisitor {
+    private class GeometryPrimitiveVisitor implements OsmPrimitiveVisitor {
 
         private final JsonObjectBuilder geomObj;
 

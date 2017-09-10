@@ -22,11 +22,13 @@ import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
 import org.openstreetmap.josm.data.projection.Projections;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
+import org.openstreetmap.josm.gui.oauth.OAuthAuthorizationWizard;
 import org.openstreetmap.josm.gui.tagging.presets.TaggingPresets;
 import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.io.CertificateAmendment;
 import org.openstreetmap.josm.io.OsmApi;
 import org.openstreetmap.josm.io.OsmApiInitializationException;
+import org.openstreetmap.josm.io.OsmConnection;
 import org.openstreetmap.josm.io.OsmTransferCanceledException;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.JosmRuntimeException;
@@ -54,6 +56,7 @@ public class JOSMTestRules implements TestRule {
     private String i18n = null;
     private boolean platform;
     private boolean useProjection;
+    private boolean useProjectionNadGrids;
     private boolean commands;
     private boolean allowMemoryManagerLeaks;
     private boolean useMapStyles;
@@ -153,6 +156,15 @@ public class JOSMTestRules implements TestRule {
      */
     public JOSMTestRules projection() {
         useProjection = true;
+        return this;
+    }
+
+    /**
+     * Set up loading of NTV2 grit shift files to support projections that need them.
+     * @return this instance, for easy chaining
+     */
+    public JOSMTestRules projectionNadGrids() {
+        useProjectionNadGrids = true;
         return this;
     }
 
@@ -272,6 +284,7 @@ public class JOSMTestRules implements TestRule {
         User.clearUserMap();
         // Setup callbacks
         DeleteCommand.setDeletionCallback(DeleteAction.defaultDeletionCallback);
+        OsmConnection.setOAuthAccessTokenFetcher(OAuthAuthorizationWizard::obtainAccessToken);
 
         // Set up i18n
         if (i18n != null) {
@@ -312,6 +325,10 @@ public class JOSMTestRules implements TestRule {
 
         if (useProjection) {
             Main.setProjection(Projections.getProjectionByCode("EPSG:3857")); // Mercator
+        }
+
+        if (useProjectionNadGrids) {
+            MainApplication.setupNadGridSources();
         }
 
         // Set API

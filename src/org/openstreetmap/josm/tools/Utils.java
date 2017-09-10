@@ -339,7 +339,7 @@ public final class Utils {
      * @return A copy of the original array, or {@code null} if {@code array} is null
      * @since 6222
      */
-    public static char[] copyArray(char ... array) {
+    public static char[] copyArray(char... array) {
         if (array != null) {
             return Arrays.copyOf(array, array.length);
         }
@@ -767,7 +767,7 @@ public final class Utils {
         return strip(str, stripChars(skipChars));
     }
 
-    private static String strip(final String str, final char ... skipChars) {
+    private static String strip(final String str, final char... skipChars) {
 
         int start = 0;
         int end = str.length();
@@ -789,7 +789,7 @@ public final class Utils {
         return str.substring(start, end);
     }
 
-    private static boolean isStrippedChar(char c, final char ... skipChars) {
+    private static boolean isStrippedChar(char c, final char... skipChars) {
         return Character.isWhitespace(c) || Character.isSpaceChar(c) || stripChar(skipChars, c);
     }
 
@@ -1451,7 +1451,7 @@ public final class Utils {
      * @see AccessibleObject#setAccessible
      * @since 10223
      */
-    public static void setObjectsAccessible(final AccessibleObject ... objects) {
+    public static void setObjectsAccessible(final AccessibleObject... objects) {
         if (objects != null && objects.length > 0) {
             AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
                 for (AccessibleObject o : objects) {
@@ -1581,7 +1581,7 @@ public final class Utils {
         if (firstDotPos == lastDotPos) {
             return 0;
         }
-        return firstDotPos > - 1 ? Integer.parseInt(version.substring(firstDotPos + 1,
+        return firstDotPos > -1 ? Integer.parseInt(version.substring(firstDotPos + 1,
                 lastDotPos > -1 ? lastDotPos : version.length())) : 0;
     }
 

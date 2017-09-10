@@ -13,8 +13,8 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.coor.LatLonToEastNorthConverter;
+import org.openstreetmap.josm.data.osm.visitor.OsmPrimitiveVisitor;
 import org.openstreetmap.josm.data.osm.visitor.PrimitiveVisitor;
-import org.openstreetmap.josm.data.osm.visitor.Visitor;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -232,7 +232,13 @@ public final class Node extends OsmPrimitive implements INode {
     }
 
     @Override
-    public void accept(Visitor visitor) {
+    @Deprecated
+    public void accept(org.openstreetmap.josm.data.osm.visitor.Visitor visitor) {
+        visitor.visit(this);
+    }
+
+    @Override
+    public void accept(OsmPrimitiveVisitor visitor) {
         visitor.visit(this);
     }
 

@@ -5,6 +5,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import static org.openstreetmap.josm.tools.I18n.trn;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
@@ -98,6 +99,7 @@ import org.openstreetmap.josm.gui.download.DownloadDialog;
 import org.openstreetmap.josm.gui.io.CustomConfigurator.XMLCommandProcessor;
 import org.openstreetmap.josm.gui.io.SaveLayersDialog;
 import org.openstreetmap.josm.gui.layer.AutosaveTask;
+import org.openstreetmap.josm.gui.layer.ImageryLayer;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerAddEvent;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerChangeListener;
@@ -106,6 +108,7 @@ import org.openstreetmap.josm.gui.layer.LayerManager.LayerRemoveEvent;
 import org.openstreetmap.josm.gui.layer.MainLayerManager;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.layer.TMSLayer;
+import org.openstreetmap.josm.gui.oauth.OAuthAuthorizationWizard;
 import org.openstreetmap.josm.gui.preferences.ToolbarPreferences;
 import org.openstreetmap.josm.gui.preferences.display.LafPreference;
 import org.openstreetmap.josm.gui.preferences.imagery.ImageryPreference;
@@ -125,6 +128,7 @@ import org.openstreetmap.josm.io.MessageNotifier;
 import org.openstreetmap.josm.io.OnlineResource;
 import org.openstreetmap.josm.io.OsmApi;
 import org.openstreetmap.josm.io.OsmApiInitializationException;
+import org.openstreetmap.josm.io.OsmConnection;
 import org.openstreetmap.josm.io.OsmTransferCanceledException;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.openstreetmap.josm.io.auth.CredentialsManager;
@@ -384,6 +388,19 @@ public class MainApplication extends Main {
     protected Collection<InitializationTask> parallelInitializationTasks() {
         return Arrays.asList(
             new InitializationTask(tr("Initializing OSM API"), () -> {
+                    OsmApi.addOsmApiInitializationListener(api -> {
+                        // This checks if there are any layers currently displayed that are now on the blacklist, and removes them.
+                        // This is a rare situation - probably only occurs if the user changes the API URL in the preferences menu.
+                        // Otherwise they would not have been able to load the layers in the first place because they would have been disabled
+                        if (isDisplayingMapView()) {
+                            for (Layer l : getLayerManager().getLayersOfType(ImageryLayer.class)) {
+                                if (((ImageryLayer) l).getInfo().isBlacklisted()) {
+                                    Logging.info(tr("Removed layer {0} because it is not allowed by the configured API.", l.getName()));
+                                    getLayerManager().removeLayer(l);
+                                }
+                            }
+                        }
+                    });
                     // We try to establish an API connection early, so that any API
                     // capabilities are already known to the editor instance. However
                     // if it goes wrong that's not critical at this stage.
@@ -915,8 +932,9 @@ public class MainApplication extends Main {
                 args.getSingle(Option.GEOMETRY).orElse(null),
                 !args.hasOption(Option.NO_MAXIMIZE) && Main.pref.getBoolean("gui.maximized", false));
         final MainFrame mainFrame = new MainFrame(geometry);
-        if (mainFrame.getContentPane() instanceof JComponent) {
-            contentPanePrivate = (JComponent) mainFrame.getContentPane();
+        final Container contentPane = mainFrame.getContentPane();
+        if (contentPane instanceof JComponent) {
+            contentPanePrivate = (JComponent) contentPane;
         }
         mainPanel = mainFrame.getPanel();
         Main.parent = mainFrame;
@@ -977,12 +995,7 @@ public class MainApplication extends Main {
         toolbar = new ToolbarPreferences();
         Main.toolbar = toolbar;
         ProjectionPreference.setProjection();
-        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
-                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_LOCAL,
-                NTV2Proj4DirGridShiftFileSource.getInstance());
-        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
-                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_DOWNLOAD,
-                JOSM_WEBSITE_NTV2_SOURCE);
+        setupNadGridSources();
         GuiHelper.translateJavaInternalMessages();
         preConstructorInit();
 
@@ -1038,6 +1051,19 @@ public class MainApplication extends Main {
         }
     }
 
+    /**
+     * Setup the sources for NTV2 grid shift files for projection support.
+     * @since 12795
+     */
+    public static void setupNadGridSources() {
+        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
+                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_LOCAL,
+                NTV2Proj4DirGridShiftFileSource.getInstance());
+        NTV2GridShiftFileWrapper.registerNTV2GridShiftFileSource(
+                NTV2GridShiftFileWrapper.NTV2_SOURCE_PRIORITY_DOWNLOAD,
+                JOSM_WEBSITE_NTV2_SOURCE);
+    }
+
     static void applyWorkarounds() {
         // Workaround for JDK-8180379: crash on Windows 10 1703 with Windows L&F and java < 8u141 / 9+172
         // To remove during Java 9 migration
@@ -1061,8 +1087,17 @@ public class MainApplication extends Main {
     }
 
     static void setupCallbacks() {
+        OsmConnection.setOAuthAccessTokenFetcher(OAuthAuthorizationWizard::obtainAccessToken);
         MessageNotifier.setNotifierCallback(MainApplication::notifyNewMessages);
         DeleteCommand.setDeletionCallback(DeleteAction.defaultDeletionCallback);
+        OsmUrlToBounds.setMapSizeSupplier(() -> {
+            if (isDisplayingMapView()) {
+                MapView mapView = getMap().mapView;
+                return new Dimension(mapView.getWidth(), mapView.getHeight());
+            } else {
+                return GuiHelper.getScreenSize();
+            }
+        });
     }
 
     static void setupUIManager() {
