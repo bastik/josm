@@ -66,8 +66,11 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.data.Preferences;
+import org.openstreetmap.josm.data.StructUtils;
+import org.openstreetmap.josm.data.StructUtils.StructEntry;
+import org.openstreetmap.josm.data.StructUtils.WriteExplicitly;
 import org.openstreetmap.josm.io.CertificateAmendment.CertAmend;
+import org.openstreetmap.josm.spi.preferences.Config;
 
 /**
  * {@code PlatformHook} implementation for Microsoft Windows systems.
@@ -84,21 +87,21 @@ public class PlatformHookWindows implements PlatformHook {
         /**
          * The character subset. Basically a free identifier, but should be unique.
          */
-        @Preferences.pref
+        @StructEntry
         public String charset;
 
         /**
          * Platform font name.
          */
-        @Preferences.pref
-        @Preferences.writeExplicitly
+        @StructEntry
+        @WriteExplicitly
         public String name = "";
 
         /**
          * File name.
          */
-        @Preferences.pref
-        @Preferences.writeExplicitly
+        @StructEntry
+        @WriteExplicitly
         public String file = "";
 
         /**
@@ -306,7 +309,7 @@ public class PlatformHookWindows implements PlatformHook {
                 sb.append(' ').append(releaseId);
             }
             sb.append(" (").append(getCurrentBuild()).append(')');
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | JosmRuntimeException e) {
             Logging.error(e);
         }
         return sb.toString();
@@ -473,7 +476,7 @@ public class PlatformHookWindows implements PlatformHook {
     @Override
     public File getDefaultUserDataDirectory() {
         // Use preferences directory by default
-        return Main.pref.getPreferencesDirectory();
+        return Config.getDirs().getPreferencesDirectory(false);
     }
 
     /**
@@ -500,12 +503,12 @@ public class PlatformHookWindows implements PlatformHook {
      * @param templateFileName file name of the fontconfig.properties template file
      */
     protected void extendFontconfig(String templateFileName) {
-        String customFontconfigFile = Main.pref.get("fontconfig.properties", null);
+        String customFontconfigFile = Config.getPref().get("fontconfig.properties", null);
         if (customFontconfigFile != null) {
             Utils.updateSystemProperty("sun.awt.fontconfig", customFontconfigFile);
             return;
         }
-        if (!Main.pref.getBoolean("font.extended-unicode", true))
+        if (!Config.getPref().getBoolean("font.extended-unicode", true))
             return;
 
         String javaLibPath = System.getProperty("java.home") + File.separator + "lib";
@@ -518,12 +521,12 @@ public class PlatformHookWindows implements PlatformHook {
             Properties props = new Properties();
             props.load(fis);
             byte[] content = Files.readAllBytes(templateFile);
-            File cachePath = Main.pref.getCacheDirectory();
+            File cachePath = Config.getDirs().getCacheDirectory(true);
             Path fontconfigFile = cachePath.toPath().resolve("fontconfig.properties");
             OutputStream os = Files.newOutputStream(fontconfigFile);
             os.write(content);
             try (Writer w = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-                Collection<FontEntry> extrasPref = Main.pref.getListOfStructs(
+                Collection<FontEntry> extrasPref = StructUtils.getListOfStructs(Config.getPref(),
                         "font.extended-unicode.extra-items", getAdditionalFonts(), FontEntry.class);
                 Collection<FontEntry> extras = new ArrayList<>();
                 w.append("\n\n# Added by JOSM to extend unicode coverage of Java font support:\n\n");

@@ -37,7 +37,6 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AbstractSelectAction;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
@@ -57,7 +56,6 @@ import org.openstreetmap.josm.data.osm.event.DataChangedEvent;
 import org.openstreetmap.josm.data.osm.event.DataSetListener;
 import org.openstreetmap.josm.data.osm.event.DatasetEventManager;
 import org.openstreetmap.josm.data.osm.event.DatasetEventManager.FireMode;
-import org.openstreetmap.josm.data.osm.search.SearchSetting;
 import org.openstreetmap.josm.data.osm.event.NodeMovedEvent;
 import org.openstreetmap.josm.data.osm.event.PrimitivesAddedEvent;
 import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
@@ -65,6 +63,7 @@ import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
 import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
 import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
 import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
+import org.openstreetmap.josm.data.osm.search.SearchSetting;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
@@ -81,11 +80,13 @@ import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.gui.util.HighlightHelper;
 import org.openstreetmap.josm.gui.widgets.ListPopupMenu;
 import org.openstreetmap.josm.gui.widgets.PopupMenuLauncher;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.InputMapUtils;
 import org.openstreetmap.josm.tools.Shortcut;
 import org.openstreetmap.josm.tools.SubclassFilteredCollection;
 import org.openstreetmap.josm.tools.Utils;
+import org.openstreetmap.josm.tools.bugreport.BugReport;
 
 /**
  * A small tool dialog for displaying the current selection.
@@ -191,7 +192,7 @@ public class SelectionListDialog extends ToggleDialog {
      */
     class MouseEventHandler extends PopupMenuLauncher {
         private final HighlightHelper helper = new HighlightHelper();
-        private final boolean highlightEnabled = Main.pref.getBoolean("draw.target-highlight", true);
+        private final boolean highlightEnabled = Config.getPref().getBoolean("draw.target-highlight", true);
 
         MouseEventHandler() {
             super(popupMenu);
@@ -463,7 +464,7 @@ public class SelectionListDialog extends ToggleDialog {
      * JOSM selection.
      *
      */
-    private static class SelectionListModel extends AbstractListModel<OsmPrimitive>
+    static class SelectionListModel extends AbstractListModel<OsmPrimitive>
     implements ActiveLayerChangeListener, SelectionChangedListener, DataSetListener {
 
         private static final int SELECTION_HISTORY_SIZE = 10;
@@ -523,7 +524,7 @@ public class SelectionListDialog extends ToggleDialog {
                     break;
                 }
             }
-            int maxsize = Main.pref.getInteger("select.history-size", SELECTION_HISTORY_SIZE);
+            int maxsize = Config.getPref().getInt("select.history-size", SELECTION_HISTORY_SIZE);
             while (history.size() > maxsize) {
                 history.removeLast();
             }
@@ -661,14 +662,19 @@ public class SelectionListDialog extends ToggleDialog {
          * Sorts the current elements in the selection
          */
         public synchronized void sort() {
-            if (selection.size() <= Main.pref.getInteger("selection.no_sort_above", 100_000)) {
-                boolean quick = selection.size() > Main.pref.getInteger("selection.fast_sort_above", 10_000);
-                Comparator<OsmPrimitive> c = Main.pref.getBoolean("selection.sort_relations_before_ways", true)
+            int size = selection.size();
+            if (size > 1 && size <= Config.getPref().getInt("selection.no_sort_above", 100_000)) {
+                boolean quick = size > Config.getPref().getInt("selection.fast_sort_above", 10_000);
+                Comparator<OsmPrimitive> c = Config.getPref().getBoolean("selection.sort_relations_before_ways", true)
                         ? OsmPrimitiveComparator.orderingRelationsWaysNodes()
                         : OsmPrimitiveComparator.orderingWaysRelationsNodes();
-                selection.sort(c.thenComparing(quick
-                        ? OsmPrimitiveComparator.comparingUniqueId()
-                        : OsmPrimitiveComparator.comparingNames()));
+                try {
+                    selection.sort(c.thenComparing(quick
+                            ? OsmPrimitiveComparator.comparingUniqueId()
+                            : OsmPrimitiveComparator.comparingNames()));
+                } catch (IllegalArgumentException e) {
+                    throw BugReport.intercept(e).put("size", size).put("quick", quick).put("selection", selection);
+                }
             }
         }
 

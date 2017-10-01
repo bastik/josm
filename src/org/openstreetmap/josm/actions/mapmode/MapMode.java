@@ -10,14 +10,14 @@ import java.awt.event.MouseMotionListener;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
-import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
-import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
+import org.openstreetmap.josm.spi.preferences.PreferenceChangeEvent;
+import org.openstreetmap.josm.spi.preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -71,7 +71,7 @@ public abstract class MapMode extends JosmAction implements MouseListener, Mouse
      * @param shortcut a ready-created shortcut object or null if you don't want a shortcut.
      * @param mapFrame unused but kept for plugin compatibility. Can be {@code null}
      * @param cursor cursor displayed when map mode is active
-     * @deprecated use {@link #MapMode(String, String, String, Shortcut, Cursor) instead}
+     * @deprecated use {@link #MapMode(String, String, String, Shortcut, Cursor)} instead
      */
     @Deprecated
     public MapMode(String name, String iconName, String tooltip, Shortcut shortcut, MapFrame mapFrame, Cursor cursor) {
@@ -85,7 +85,7 @@ public abstract class MapMode extends JosmAction implements MouseListener, Mouse
      * @param tooltip  a longer description of the action that will be displayed in the tooltip.
      * @param mapFrame unused but kept for plugin compatibility. Can be {@code null}
      * @param cursor cursor displayed when map mode is active
-     * @deprecated use {@link #MapMode(String, String, String, Cursor) instead}
+     * @deprecated use {@link #MapMode(String, String, String, Cursor)} instead
      */
     @Deprecated
     public MapMode(String name, String iconName, String tooltip, MapFrame mapFrame, Cursor cursor) {
@@ -97,7 +97,7 @@ public abstract class MapMode extends JosmAction implements MouseListener, Mouse
      */
     public void enterMode() {
         putValue("active", Boolean.TRUE);
-        Main.pref.addPreferenceChangeListener(this);
+        Config.getPref().addPreferenceChangeListener(this);
         readPreferences();
         MainApplication.getMap().mapView.setNewCursor(cursor, this);
         updateStatusLine();
@@ -108,7 +108,7 @@ public abstract class MapMode extends JosmAction implements MouseListener, Mouse
      */
     public void exitMode() {
         putValue("active", Boolean.FALSE);
-        Main.pref.removePreferenceChangeListener(this);
+        Config.getPref().removePreferenceChangeListener(this);
         MainApplication.getMap().mapView.resetCursor(this);
     }
 

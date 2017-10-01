@@ -63,6 +63,7 @@ import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles.MapPaintSylesUpdateListener;
 import org.openstreetmap.josm.gui.mappaint.StyleSetting;
+import org.openstreetmap.josm.gui.mappaint.StyleSettingGuiFactory;
 import org.openstreetmap.josm.gui.mappaint.StyleSource;
 import org.openstreetmap.josm.gui.mappaint.loader.MapPaintStyleLoader;
 import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
@@ -699,7 +700,7 @@ public class MapPaintDialog extends ToggleDialog {
                 setMenu.setEnabled(false);
             } else {
                 for (StyleSetting s : style.settings) {
-                    s.addMenuEntry(setMenu);
+                    StyleSettingGuiFactory.getStyleSettingGui(s).addMenuEntry(setMenu);
                 }
             }
 

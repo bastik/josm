@@ -44,11 +44,12 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.PreferencesUtils;
 import org.openstreetmap.josm.data.Version;
-import org.openstreetmap.josm.data.preferences.Setting;
+import org.openstreetmap.josm.spi.preferences.Setting;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.PluginDownloadTask;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.ReadLocalPluginInformationTask;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.LanguageInfo;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
@@ -399,7 +400,7 @@ public final class CustomConfigurator {
                                 new PluginDownloadTask(Main.parent, toInstallPlugins, tr("Installing plugins"));
                         MainApplication.worker.submit(pluginDownloadTask);
                     }
-                    Collection<String> pls = new ArrayList<>(Main.pref.getCollection("plugins"));
+                    List<String> pls = new ArrayList<>(Config.getPref().getList("plugins"));
                     for (PluginInformation pi2: toInstallPlugins) {
                         if (!pls.contains(pi2.name)) {
                             pls.add(pi2.name);
@@ -412,7 +413,7 @@ public final class CustomConfigurator {
                         pls.remove(pi4.name);
                         new File(Main.pref.getPluginsDirectory(), pi4.name+".jar").deleteOnExit();
                     }
-                    Main.pref.putCollection("plugins", pls);
+                    Config.getPref().putList("plugins", pls);
                 });
             }
         };
@@ -423,9 +424,9 @@ public final class CustomConfigurator {
     private static String getDirectoryByAbbr(String base) {
         String dir;
         if ("prefs".equals(base) || base.isEmpty()) {
-            dir = Main.pref.getPreferencesDirectory().getAbsolutePath();
+            dir = Config.getDirs().getPreferencesDirectory(false).getAbsolutePath();
         } else if ("cache".equals(base)) {
-            dir = Main.pref.getCacheDirectory().getAbsolutePath();
+            dir = Config.getDirs().getCacheDirectory(false).getAbsolutePath();
         } else if ("plugins".equals(base)) {
             dir = Main.pref.getPluginsDirectory().getAbsolutePath();
         } else {
@@ -475,7 +476,7 @@ public final class CustomConfigurator {
                 engine = new ScriptEngineManager().getEngineByName("JavaScript");
                 engine.eval("API={}; API.pref={}; API.fragments={};");
 
-                engine.eval("homeDir='"+normalizeDirName(Main.pref.getPreferencesDirectory().getAbsolutePath()) +"';");
+                engine.eval("homeDir='"+normalizeDirName(Config.getDirs().getPreferencesDirectory(false).getAbsolutePath()) +"';");
                 engine.eval("josmVersion="+Version.getInstance().getVersion()+';');
                 String className = CustomConfigurator.class.getName();
                 engine.eval("API.messageBox="+className+".messageBox");

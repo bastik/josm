@@ -4,7 +4,6 @@ package org.openstreetmap.josm.gui.bugreport;
 import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
-import org.openstreetmap.josm.actions.ShowStatusReportAction;
 
 import org.openstreetmap.josm.actions.ShowStatusReportAction;
 import org.openstreetmap.josm.gui.datatransfer.ClipboardUtils;

@@ -3,9 +3,6 @@ package org.openstreetmap.josm.data.projection;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import gnu.getopt.Getopt;
-import gnu.getopt.LongOpt;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,13 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.openstreetmap.josm.CLIModule;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.CLIModule;
 import org.openstreetmap.josm.data.coor.conversion.LatLonParser;
 import org.openstreetmap.josm.tools.I18n;
-
 import org.openstreetmap.josm.tools.Utils;
+
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
 
 /**
  * Command line interface for projecting coordinates.
@@ -44,9 +43,9 @@ public class ProjectionCLI implements CLIModule {
 
     @Override
     public void processArguments(String[] argArray) {
+        Getopt.setI18nHandler(I18n::tr);
         Getopt getopt = new Getopt("JOSM projection", argArray, "Irh", new LongOpt[] {
                 new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h')});
-        getopt.setI18nHandler(I18n::tr);
 
         int c;
         while ((c = getopt.getopt()) != -1) {

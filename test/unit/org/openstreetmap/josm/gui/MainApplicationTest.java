@@ -40,6 +40,7 @@ import org.openstreetmap.josm.plugins.PluginHandlerTestIT;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.PluginListParseException;
 import org.openstreetmap.josm.plugins.PluginListParser;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -56,7 +57,7 @@ public class MainApplicationTest {
      */
     @Rule
     @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
-    public JOSMTestRules test = new JOSMTestRules().main().https().devAPI().timeout(20000);
+    public JOSMTestRules test = new JOSMTestRules().main().projection().https().devAPI().timeout(20000);
 
     /**
      * Make sure {@link MainApplication#contentPanePrivate} is initialized.
@@ -204,7 +205,7 @@ public class MainApplicationTest {
     @Test
     public void testSetupUIManager() {
         MainApplication.setupUIManager();
-        assertEquals(Main.pref.get("laf", Main.platform.getDefaultStyle()), UIManager.getLookAndFeel().getClass().getCanonicalName());
+        assertEquals(Config.getPref().get("laf", Main.platform.getDefaultStyle()), UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
     private static PluginInformation newPluginInformation(String plugin) throws PluginListParseException {
@@ -251,18 +252,18 @@ public class MainApplicationTest {
     @Test
     public void testPostConstructorProcessCmdLineBounds() {
         doTestPostConstructorProcessCmdLine(
-                "0.01,0.01,0.05,0.05",
+                "-47.20,-126.75,-47.10,-126.65",
                 "51.35,-0.4,51.60,0.2", true);
     }
 
     /**
      * Unit test of {@link MainApplication#postConstructorProcessCmdLine} - nominal case with http/https URLs.
-     * This test assumes the DEV API contains nodes around 0,0 and GPX tracks around London
+     * This test assumes the DEV API contains nodes around -47.15, -126.7 (R'lyeh) and GPX tracks around London
      */
     @Test
     public void testPostConstructorProcessCmdLineHttpUrl() {
         doTestPostConstructorProcessCmdLine(
-                "http://api06.dev.openstreetmap.org/api/0.6/map?bbox=0.01,0.01,0.05,0.05",
+                "http://api06.dev.openstreetmap.org/api/0.6/map?bbox=-126.75,-47.20,-126.65,-47.10",
                 "https://master.apis.dev.openstreetmap.org/api/0.6/trackpoints?bbox=-0.4,51.35,0.2,51.6&page=0", true);
     }
 

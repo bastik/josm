@@ -7,14 +7,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.Collection;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,6 +30,7 @@ import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.preferences.AbstractProperty;
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
+import org.openstreetmap.josm.data.preferences.StringProperty;
 import org.openstreetmap.josm.gui.ConditionalOptionPaneUtil;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.download.DownloadSourceSizingPolicy.AdjustableDownloadSizePolicy;
@@ -47,7 +47,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
 public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSource.OverpassDownloadData> {
 
     @Override
-    public AbstractDownloadSourcePanel<OverpassDownloadData> createPanel() {
+    public AbstractDownloadSourcePanel<OverpassDownloadData> createPanel(DownloadDialog dialog) {
         return new OverpassDownloadSourcePanel(this);
     }
 
@@ -89,8 +89,11 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
                 new BooleanProperty("download.overpass.query-list.opened", false);
         private static final String ACTION_IMG_SUBDIR = "dialogs";
 
+        private static final StringProperty DOWNLOAD_QUERY = new StringProperty("download.overpass.query",
+                "/*\n" + tr("Place your Overpass query below or generate one using the Overpass Turbo Query Wizard") + "\n*/");
+
         private final JosmTextArea overpassQuery;
-        private final OverpassQueryList overpassQueryList;
+        private final UserQueryList overpassQueryList;
 
         /**
          * Create a new {@link OverpassDownloadSourcePanel}
@@ -101,39 +104,26 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
             setLayout(new BorderLayout());
 
             String tooltip = tr("Build an Overpass query using the Overpass Turbo Query Wizard tool");
-            Action queryWizardAction = new AbstractAction() {
+
+            JButton openQueryWizard = new JButton(tr("Query Wizard"));
+            openQueryWizard.setToolTipText(tooltip);
+            openQueryWizard.addActionListener(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     new OverpassQueryWizardDialog(OverpassDownloadSourcePanel.this).showDialog();
                 }
-            };
+            });
 
-            JButton openQueryWizard = new JButton(tr("Query Wizard"));
-            openQueryWizard.setToolTipText(tooltip);
-            openQueryWizard.addActionListener(queryWizardAction);
-
-            // CHECKSTYLE.OFF: LineLength
-            this.overpassQuery = new JosmTextArea(
-                    "/*\n" +
-                            tr("Place your Overpass query below or generate one using the Overpass Turbo Query Wizard")
-                            + "\n*/",
-                    8, 80);
-            // CHECKSTYLE.ON: LineLength
+            this.overpassQuery = new JosmTextArea(DOWNLOAD_QUERY.get(), 8, 80);
             this.overpassQuery.setFont(GuiHelper.getMonospacedFont(overpassQuery));
-            this.overpassQuery.addFocusListener(new FocusListener() {
+            this.overpassQuery.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
                     overpassQuery.selectAll();
                 }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    // ignored
-                }
             });
 
-
-            this.overpassQueryList = new OverpassQueryList(this, this.overpassQuery);
+            this.overpassQueryList = new UserQueryList(this, this.overpassQuery, "download.overpass.query");
             this.overpassQueryList.setPreferredSize(new Dimension(350, 300));
 
             EditSnippetAction edit = new EditSnippetAction();
@@ -206,12 +196,12 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
 
         @Override
         public void rememberSettings() {
-            // nothing
+            DOWNLOAD_QUERY.put(overpassQuery.getText());
         }
 
         @Override
         public void restoreSettings() {
-            // nothing
+            overpassQuery.setText(DOWNLOAD_QUERY.get());
         }
 
         @Override
@@ -287,7 +277,7 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
         }
 
         /**
-         * Action that delegates snippet creation to {@link OverpassQueryList#createNewItem()}.
+         * Action that delegates snippet creation to {@link UserQueryList#createNewItem()}.
          */
         private class AddSnippetAction extends AbstractAction {
 
@@ -307,7 +297,7 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
         }
 
         /**
-         * Action that delegates snippet removal to {@link OverpassQueryList#removeSelectedItem()}.
+         * Action that delegates snippet removal to {@link UserQueryList#removeSelectedItem()}.
          */
         private class RemoveSnippetAction extends AbstractAction implements ListSelectionListener {
 
@@ -340,7 +330,7 @@ public class OverpassDownloadSource implements DownloadSource<OverpassDownloadSo
         }
 
         /**
-         * Action that delegates snippet edit to {@link OverpassQueryList#editSelectedItem()}.
+         * Action that delegates snippet edit to {@link UserQueryList#editSelectedItem()}.
          */
         private class EditSnippetAction extends AbstractAction implements ListSelectionListener {
 

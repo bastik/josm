@@ -42,7 +42,6 @@ import java.util.function.Supplier;
 import javax.swing.AbstractButton;
 import javax.swing.FocusManager;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.BBox;
@@ -75,13 +74,14 @@ import org.openstreetmap.josm.gui.mappaint.styleelement.StyleElement;
 import org.openstreetmap.josm.gui.mappaint.styleelement.Symbol;
 import org.openstreetmap.josm.gui.mappaint.styleelement.TextLabel;
 import org.openstreetmap.josm.gui.mappaint.styleelement.placement.PositionForAreaStrategy;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.CompositeList;
 import org.openstreetmap.josm.tools.Geometry;
 import org.openstreetmap.josm.tools.Geometry.AreaAndPerimeter;
+import org.openstreetmap.josm.tools.HiDPISupport;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.JosmRuntimeException;
 import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.HiDPISupport;
 import org.openstreetmap.josm.tools.Utils;
 import org.openstreetmap.josm.tools.bugreport.BugReport;
 
@@ -93,7 +93,7 @@ public class StyledMapRenderer extends AbstractMapRenderer {
 
     private static final ForkJoinPool THREAD_POOL =
             Utils.newForkJoinPool(
-                    Main.pref.getInteger(
+                    Config.getPref().getInt(
                             "mappaint.StyledMapRenderer.style_creation.numberOfThreads",
                             Runtime.getRuntime().availableProcessors()),
                     "styled-map-renderer-%d",
@@ -240,7 +240,7 @@ public class StyledMapRenderer extends AbstractMapRenderer {
         Boolean cached = IS_GLYPH_VECTOR_DOUBLE_TRANSLATION_BUG.get(font);
         if (cached != null)
             return cached;
-        String overridePref = Main.pref.get("glyph-bug", "auto");
+        String overridePref = Config.getPref().get("glyph-bug", "auto");
         if ("auto".equals(overridePref)) {
             FontRenderContext frc = new FontRenderContext(null, false, false);
             GlyphVector gv = font.createGlyphVector(frc, "x");
@@ -1666,7 +1666,7 @@ public class StyledMapRenderer extends AbstractMapRenderer {
     private void paintRecord(StyleRecord record) {
         try {
             record.paintPrimitive(paintSettings, this);
-        } catch (JosmRuntimeException | IllegalArgumentException | IllegalStateException e) {
+        } catch (JosmRuntimeException | IllegalArgumentException | IllegalStateException | NullPointerException e) {
             throw BugReport.intercept(e).put("record", record);
         }
     }

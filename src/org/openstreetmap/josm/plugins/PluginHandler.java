@@ -53,6 +53,7 @@ import javax.swing.UIManager;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.RestartAction;
+import org.openstreetmap.josm.data.PreferencesUtils;
 import org.openstreetmap.josm.data.Version;
 import org.openstreetmap.josm.gui.HelpAwareOptionPane;
 import org.openstreetmap.josm.gui.HelpAwareOptionPane.ButtonSpec;
@@ -66,6 +67,7 @@ import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.JosmTextArea;
 import org.openstreetmap.josm.io.OfflineAccessException;
 import org.openstreetmap.josm.io.OnlineResource;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -137,7 +139,10 @@ public final class PluginHandler {
             new DeprecatedPlugin("josm-geojson", tr("replaced by new {0} plugin", "geojson")),
             new DeprecatedPlugin("proj4j", inCore),
             new DeprecatedPlugin("OpenStreetView", tr("replaced by new {0} plugin", "OpenStreetCam")),
-            new DeprecatedPlugin("imageryadjust", inCore)
+            new DeprecatedPlugin("imageryadjust", inCore),
+            new DeprecatedPlugin("walkingpapers", tr("replaced by new {0} plugin", "fieldpapers")),
+            new DeprecatedPlugin("czechaddress", tr("no longer required")),
+            new DeprecatedPlugin("kendzi3d_Improved_by_Andrei", tr("no longer required"))
         );
     }
 
@@ -303,7 +308,7 @@ public final class PluginHandler {
     static {
         try {
             sources.add(ClassLoader.getSystemClassLoader());
-            sources.add(org.openstreetmap.josm.gui.MainApplication.class.getClassLoader());
+            sources.add(PluginHandler.class.getClassLoader());
         } catch (SecurityException ex) {
             Logging.debug(ex);
             sources.add(ImageProvider.class.getClassLoader());
@@ -343,7 +348,7 @@ public final class PluginHandler {
         for (DeprecatedPlugin depr : DEPRECATED_PLUGINS) {
             if (plugins.contains(depr.name)) {
                 plugins.remove(depr.name);
-                Main.pref.removeFromCollection("plugins", depr.name);
+                PreferencesUtils.removeFromList(Config.getPref(), "plugins", depr.name);
                 removedPlugins.add(depr);
             }
         }
@@ -397,7 +402,7 @@ public final class PluginHandler {
                     +"<br>It should be disabled.<br>Delete from preferences?</html>",
                     Utils.escapeReservedCharactersHTML(unmaintained));
             if (confirmDisablePlugin(parent, msg, unmaintained)) {
-                Main.pref.removeFromCollection("plugins", unmaintained);
+                PreferencesUtils.removeFromList(Config.getPref(), "plugins", unmaintained);
                 plugins.remove(unmaintained);
             }
         }
@@ -421,7 +426,7 @@ public final class PluginHandler {
         String message = null;
         String togglePreferenceKey = null;
         int v = Version.getInstance().getVersion();
-        if (Main.pref.getInteger("pluginmanager.version", 0) < v) {
+        if (Config.getPref().getInt("pluginmanager.version", 0) < v) {
             message =
                 "<html>"
                 + tr("You updated your JOSM software.<br>"
@@ -432,11 +437,11 @@ public final class PluginHandler {
             togglePreferenceKey = "pluginmanager.version-based-update.policy";
         } else {
             long tim = System.currentTimeMillis();
-            long last = Main.pref.getLong("pluginmanager.lastupdate", 0);
-            Integer maxTime = Main.pref.getInteger("pluginmanager.time-based-update.interval", DEFAULT_TIME_BASED_UPDATE_INTERVAL);
+            long last = Config.getPref().getLong("pluginmanager.lastupdate", 0);
+            Integer maxTime = Config.getPref().getInt("pluginmanager.time-based-update.interval", DEFAULT_TIME_BASED_UPDATE_INTERVAL);
             long d = TimeUnit.MILLISECONDS.toDays(tim - last);
             if ((last <= 0) || (maxTime <= 0)) {
-                Main.pref.put("pluginmanager.lastupdate", Long.toString(tim));
+                Config.getPref().put("pluginmanager.lastupdate", Long.toString(tim));
             } else if (d > maxTime) {
                 message =
                     "<html>"
@@ -453,7 +458,7 @@ public final class PluginHandler {
 
         // check whether automatic update at startup was disabled
         //
-        String policy = Main.pref.get(togglePreferenceKey, "ask").trim().toLowerCase(Locale.ENGLISH);
+        String policy = Config.getPref().get(togglePreferenceKey, "ask").trim().toLowerCase(Locale.ENGLISH);
         switch(policy) {
         case "never":
             if ("pluginmanager.version-based-update.policy".equals(togglePreferenceKey)) {
@@ -507,16 +512,16 @@ public final class PluginHandler {
         if (pnlMessage.isRememberDecision()) {
             switch(ret) {
             case 0:
-                Main.pref.put(togglePreferenceKey, "always");
+                Config.getPref().put(togglePreferenceKey, "always");
                 break;
             case JOptionPane.CLOSED_OPTION:
             case 1:
-                Main.pref.put(togglePreferenceKey, "never");
+                Config.getPref().put(togglePreferenceKey, "never");
                 break;
             default: // Do nothing
             }
         } else {
-            Main.pref.put(togglePreferenceKey, "ask");
+            Config.getPref().put(togglePreferenceKey, "ask");
         }
         return ret == 0;
     }
@@ -606,11 +611,11 @@ public final class PluginHandler {
                     // restart if some plugins have been downloaded
                     if (!task.getDownloadedPlugins().isEmpty()) {
                         // update plugin list in preferences
-                        Set<String> plugins = new HashSet<>(Main.pref.getCollection("plugins"));
+                        Set<String> plugins = new HashSet<>(Config.getPref().getList("plugins"));
                         for (PluginInformation plugin : task.getDownloadedPlugins()) {
                             plugins.add(plugin.name);
                         }
-                        Main.pref.putCollection("plugins", plugins);
+                        Config.getPref().putList("plugins", new ArrayList<>(plugins));
                         // restart
                         try {
                             RestartAction.restartJOSM();
@@ -795,7 +800,7 @@ public final class PluginHandler {
             Logging.error(e);
         }
         if (msg != null && confirmDisablePlugin(parent, msg, plugin.name)) {
-            Main.pref.removeFromCollection("plugins", plugin.name);
+            PreferencesUtils.removeFromList(Config.getPref(), "plugins", plugin.name);
         }
     }
 
@@ -840,7 +845,7 @@ public final class PluginHandler {
             for (PluginInformation info : toLoad) {
                 PluginClassLoader cl = classLoaders.get(info);
                 DEPENDENCIES:
-                for (String depName : info.getRequiredPlugins()) {
+                for (String depName : info.getLocalRequiredPlugins()) {
                     for (PluginInformation depInfo : toLoad) {
                         if (depInfo.getName().equals(depName)) {
                             cl.addDependency(classLoaders.get(depInfo));
@@ -853,11 +858,12 @@ public final class PluginHandler {
                             continue DEPENDENCIES;
                         }
                     }
-                    throw new AssertionError("unable to find dependency " + depName + " for plugin " + info.getName());
+                    Logging.error("unable to find dependency " + depName + " for plugin " + info.getName());
                 }
             }
 
             extendJoinedPluginResourceCL(toLoad);
+            ImageProvider.addAdditionalClassLoaders(getResourceClassLoaders());
             monitor.setTicksCount(toLoad.size());
             for (PluginInformation info : toLoad) {
                 monitor.setExtraText(tr("Loading plugin ''{0}''...", info.name));
@@ -968,7 +974,7 @@ public final class PluginHandler {
         }
         try {
             monitor.beginTask(tr("Determining plugins to load..."));
-            Set<String> plugins = new HashSet<>(Main.pref.getCollection("plugins", new LinkedList<String>()));
+            Set<String> plugins = new HashSet<>(Config.getPref().getList("plugins", new LinkedList<String>()));
             Logging.debug("Plugins list initialized to {0}", plugins);
             String systemProp = System.getProperty("josm.plugins");
             if (systemProp != null) {
@@ -1156,8 +1162,8 @@ public final class PluginHandler {
         }
         if (pluginsWanted == null) {
             // if all plugins updated, remember the update because it was successful
-            Main.pref.putInteger("pluginmanager.version", Version.getInstance().getVersion());
-            Main.pref.put("pluginmanager.lastupdate", Long.toString(System.currentTimeMillis()));
+            Config.getPref().putInt("pluginmanager.version", Version.getInstance().getVersion());
+            Config.getPref().put("pluginmanager.lastupdate", Long.toString(System.currentTimeMillis()));
         }
         return plugins;
     }
@@ -1449,9 +1455,7 @@ public final class PluginHandler {
             // don't know what plugin threw the exception
             return null;
 
-        Set<String> plugins = new HashSet<>(
-                Main.pref.getCollection("plugins", Collections.<String>emptySet())
-        );
+        Set<String> plugins = new HashSet<>(Config.getPref().getList("plugins"));
         final PluginInformation pluginInfo = plugin.getPluginInformation();
         if (!plugins.contains(pluginInfo.name))
             // plugin not activated ? strange in this context but anyway, don't bother
@@ -1466,7 +1470,7 @@ public final class PluginHandler {
         case 1:
             // deactivate the plugin
             plugins.remove(plugin.getPluginInformation().name);
-            Main.pref.putCollection("plugins", plugins);
+            Config.getPref().putList("plugins", new ArrayList<>(plugins));
             GuiHelper.runInEDTAndWait(() -> JOptionPane.showMessageDialog(
                     Main.parent,
                     tr("The plugin has been removed from the configuration. Please restart JOSM to unload the plugin."),
@@ -1485,7 +1489,7 @@ public final class PluginHandler {
      * @return The list of loaded plugins
      */
     public static Collection<String> getBugReportInformation() {
-        final Collection<String> pl = new TreeSet<>(Main.pref.getCollection("plugins", new LinkedList<>()));
+        final Collection<String> pl = new TreeSet<>(Config.getPref().getList("plugins", new LinkedList<>()));
         for (final PluginProxy pp : pluginList) {
             PluginInformation pi = pp.getPluginInformation();
             pl.remove(pi.name);
@@ -1570,7 +1574,7 @@ public final class PluginHandler {
         }
 
         public void initDontShowAgain(String preferencesKey) {
-            String policy = Main.pref.get(preferencesKey, "ask");
+            String policy = Config.getPref().get(preferencesKey, "ask");
             policy = policy.trim().toLowerCase(Locale.ENGLISH);
             cbDontShowAgain.setSelected(!"ask".equals(policy));
         }

@@ -28,7 +28,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.OpenFileAction.OpenFileTask;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
@@ -45,6 +44,7 @@ import org.openstreetmap.josm.gui.layer.LayerManager.LayerChangeListener;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerOrderChangeEvent;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerRemoveEvent;
 import org.openstreetmap.josm.gui.util.GuiHelper;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -115,8 +115,8 @@ public class AutosaveTask extends TimerTask implements LayerChangeListener, List
     private final Object layersLock = new Object();
     private final Deque<File> deletedLayers = new LinkedList<>();
 
-    private final File autosaveDir = new File(Main.pref.getUserDataDirectory(), AUTOSAVE_DIR);
-    private final File deletedLayersDir = new File(Main.pref.getUserDataDirectory(), DELETED_LAYERS_DIR);
+    private final File autosaveDir = new File(Config.getDirs().getUserDataDirectory(true), AUTOSAVE_DIR);
+    private final File deletedLayersDir = new File(Config.getDirs().getUserDataDirectory(true), DELETED_LAYERS_DIR);
 
     /**
      * Replies the autosave directory.
@@ -192,7 +192,7 @@ public class AutosaveTask extends TimerTask implements LayerChangeListener, List
         while (true) {
             String filename = String.format("%1$s_%2$tY%2$tm%2$td_%2$tH%2$tM%2$tS%2$tL%3$s",
                     layer.layerFileName, now, index == 0 ? "" : ('_' + Integer.toString(index)));
-            File result = new File(autosaveDir, filename + '.' + Main.pref.get("autosave.extension", "osm"));
+            File result = new File(autosaveDir, filename + '.' + Config.getPref().get("autosave.extension", "osm"));
             try {
                 if (index > PROP_INDEX_LIMIT.get())
                     throw new IOException("index limit exceeded");

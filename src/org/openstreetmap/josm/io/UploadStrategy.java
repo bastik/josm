@@ -5,7 +5,8 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.Locale;
 
-import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.PreferencesUtils;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.Logging;
 
 /**
@@ -75,15 +76,15 @@ public enum UploadStrategy {
      * @return the upload strategy currently configured in the preferences.
      */
     public static UploadStrategy getFromPreferences() {
-        String v = Main.pref.get("osm-server.upload-strategy", null);
+        String v = Config.getPref().get("osm-server.upload-strategy", null);
         if (v == null) {
             // legacy support. Until 12/2009 we had osm-server.atomic-upload only.
             // If we still find "osm-server.atomic-upload" we use it and remove it.
             // When the preferences are saved the next time, "osm-server.upload-strategy"
             // will be inserted.
-            v = Main.pref.get("osm-server.atomic-upload", null);
+            v = Config.getPref().get("osm-server.atomic-upload", null);
             if (v != null) {
-                Main.pref.removeFromCollection("osm-server.atomic-upload", v);
+                PreferencesUtils.removeFromList(Config.getPref(), "osm-server.atomic-upload", v);
             } else {
                 v = "";
             }
@@ -109,6 +110,6 @@ public enum UploadStrategy {
      * @param strategy the strategy to save
      */
     public static void saveToPreferences(UploadStrategy strategy) {
-        Main.pref.put("osm-server.upload-strategy", strategy.getPreferenceValue());
+        Config.getPref().put("osm-server.upload-strategy", strategy.getPreferenceValue());
     }
 }

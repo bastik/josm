@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -75,7 +75,7 @@ public abstract class CacheCustomContent<T extends Throwable> {
     public CacheCustomContent(String ident, int updateInterval) {
         this.ident = ident;
         this.updateInterval = updateInterval;
-        this.path = new File(Main.pref.getCacheDirectory(), ident);
+        this.path = new File(Config.getDirs().getCacheDirectory(true), ident);
     }
 
     /**
@@ -90,7 +90,7 @@ public abstract class CacheCustomContent<T extends Throwable> {
         if (isOffline()) {
             return false;
         }
-        return Main.pref.getInteger("cache." + ident, 0) + updateInterval < TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        return Config.getPref().getInt("cache." + ident, 0) + updateInterval < TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
                 || !isCacheValid();
     }
 
@@ -140,7 +140,7 @@ public abstract class CacheCustomContent<T extends Throwable> {
     private byte[] updateForce() throws T {
         this.data = updateData();
         saveToDisk();
-        Main.pref.putInteger("cache." + ident, (int) (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
+        Config.getPref().putInt("cache." + ident, (int) (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())));
         return data;
     }
 
