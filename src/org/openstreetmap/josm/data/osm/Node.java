@@ -231,15 +231,6 @@ public final class Node extends OsmPrimitive implements INode {
             throw new DataIntegrityProblemException("Complete node with null coordinates: " + toString());
     }
 
-    /**
-     * @deprecated no longer supported
-     */
-    @Override
-    @Deprecated
-    public void accept(org.openstreetmap.josm.data.osm.visitor.Visitor visitor) {
-        visitor.visit(this);
-    }
-
     @Override
     public void accept(OsmPrimitiveVisitor visitor) {
         visitor.visit(this);

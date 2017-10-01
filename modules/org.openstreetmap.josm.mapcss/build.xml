@@ -2,6 +2,8 @@
 <project name="org.openstreetmap.josm.data.mapcss" default="dist">
 
     <property name="required-modules">
+        gnu.getopt.josmlib
+        org.openstreetmap.josm.spi.preferences
         org.openstreetmap.josm.base
         org.openstreetmap.josm.data.osm
         org.openstreetmap.josm.data.coordinate
@@ -13,9 +15,9 @@
         <include name="org/openstreetmap/josm/gui/mappaint/*.java"/>
         <exclude name="org/openstreetmap/josm/gui/mappaint/MapPaintMenu.java"/>
         <include name="org/openstreetmap/josm/gui/mappaint/mapcss/*.java"/>
-        <!-- TODO: don't copy generated sources, but generate them here -->
-        <include name="org/openstreetmap/josm/gui/mappaint/mapcss/parsergen/*.java"/>
+        <include name="org/openstreetmap/josm/gui/mappaint/mapcss/parsergen/*.java"/> <!-- TODO: don't copy generated sources, but generate them here -->
         <include name="org/openstreetmap/josm/gui/mappaint/styleelement/*.java"/>
+        <include name="org/openstreetmap/josm/tools/RotationAngle.java"/>  <!-- FIXME: mappaint class, not general utility -->
     </fileset>
 
     <!-- TODO: actual JOSM styles do not really belong in generic mapcss module -->

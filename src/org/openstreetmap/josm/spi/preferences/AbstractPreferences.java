@@ -4,8 +4,6 @@ package org.openstreetmap.josm.spi.preferences;
 import java.util.List;
 import java.util.Map;
 
-import org.openstreetmap.josm.tools.Logging;
-
 /**
  * Abstract implementation of the {@link IPreferences} interface.
  * @since 12847
@@ -42,7 +40,8 @@ public abstract class AbstractPreferences implements IPreferences {
             return Integer.parseInt(v);
         } catch (NumberFormatException e) {
             // fall out
-            Logging.trace(e);
+            //FIXME:
+            //Logging.trace(e);
         }
         return def;
     }
@@ -62,7 +61,8 @@ public abstract class AbstractPreferences implements IPreferences {
             return Long.parseLong(v);
         } catch (NumberFormatException e) {
             // fall out
-            Logging.trace(e);
+            //FIXME:
+            //Logging.trace(e);
         }
         return def;
     }
@@ -82,7 +82,8 @@ public abstract class AbstractPreferences implements IPreferences {
             return Double.parseDouble(v);
         } catch (NumberFormatException e) {
             // fall out
-            Logging.trace(e);
+            //FIXME:
+            //Logging.trace(e);
         }
         return def;
     }

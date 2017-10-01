@@ -206,14 +206,6 @@ public final class Way extends OsmPrimitive implements IWay {
         return chunkSet;
     }
 
-    /**
-     * @deprecated no longer supported
-     */
-    @Deprecated
-    @Override public void accept(org.openstreetmap.josm.data.osm.visitor.Visitor visitor) {
-        visitor.visit(this);
-    }
-
     @Override public void accept(OsmPrimitiveVisitor visitor) {
         visitor.visit(this);
     }
@@ -672,7 +664,7 @@ public final class Way extends OsmPrimitive implements IWay {
         }
         return false;
     }
-    
+
     /**
      * Replies true if all nodes of the way are drawable, false otherwise.
      * @return true if all nodes of the way are drawable, false otherwise.

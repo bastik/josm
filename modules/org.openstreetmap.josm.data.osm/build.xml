@@ -2,6 +2,7 @@
 <project name="org.openstreetmap.josm.data.osm" default="dist">
 
     <property name="required-modules">
+        org.openstreetmap.josm.spi.preferences
         org.openstreetmap.josm.base
         org.openstreetmap.josm.data.coordinate
     </property>
@@ -31,9 +32,14 @@
         <include name="org/openstreetmap/josm/data/osm/TagMap.java"/>
         <include name="org/openstreetmap/josm/data/osm/OsmPrimitiveType.java"/>
         <include name="org/openstreetmap/josm/data/osm/visitor/PrimitiveVisitor.java"/>
-        <include name="org/openstreetmap/josm/data/osm/visitor/Visitor.java"/>
-        <include name="org/openstreetmap/josm/data/osm/visitor/AbstractVisitor.java"/>
+        <include name="org/openstreetmap/josm/data/osm/visitor/OsmPrimitiveVisitor.java"/>
         <include name="org/openstreetmap/josm/data/osm/BBox.java"/>
         <include name="org/openstreetmap/josm/data/osm/BBoxProvider.java"/>
+        <include name="org/openstreetmap/josm/data/osm/NameFormatter.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Changeset.java"/>
+        <include name="org/openstreetmap/josm/data/osm/ChangesetDiscussionComment.java"/>
+        <include name="org/openstreetmap/josm/data/osm/User.java"/>
+        <include name="org/openstreetmap/josm/data/osm/Storage.java"/>      <!-- FIXME: base widget -->
+        <include name="org/openstreetmap/josm/data/osm/Hash.java"/>         <!-- FIXME: base widget -->
     </fileset>
 </project>

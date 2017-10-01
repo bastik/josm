@@ -105,21 +105,22 @@
 
     <target name="dist" depends="compile">
         <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${src-resources.dir}"/>
         <delete file="${module.jar}"/>
         <jar destfile="${module.jar}" basedir="${build.dir}">
             <manifest>
                 <attribute name="Permissions" value="all-permissions"/>
                 <attribute name="Codebase" value="josm.openstreetmap.de"/>
             </manifest>
-            <zipfileset dir="src/main/resources" prefix="resources"/>
+            <zipfileset dir="${src-resources.dir}" prefix="resources"/>
         </jar>
     </target>
 
     <target name="clean">
-        <delete includeemptydirs="true">
+        <delete includeemptydirs="true" failonerror="false">
             <fileset dir="${src-java.dir}" includes="**/*" excludes="**/module-info.java"/>
         </delete>
-        <delete includeemptydirs="true">
+        <delete includeemptydirs="true" failonerror="false">
             <fileset dir="${src-resources.dir}" includes="**/*"/>
         </delete>
         <delete dir="${build.dir}"/>

@@ -3,6 +3,8 @@
 
     <!-- modules in an order respecting dependencies -->
     <property name="modules">
+        gnu.getopt.josmlib
+        org.openstreetmap.josm.spi.preferences
         org.openstreetmap.josm.base
         org.openstreetmap.josm.data.coordinate
         org.openstreetmap.josm.data.osm

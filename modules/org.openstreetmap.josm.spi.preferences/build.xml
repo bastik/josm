@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="org.openstreetmap.josm.spi.preferences" default="dist">
+
+    <import file="${basedir}/../share/build-common.xml"/>
+
+    <fileset id="src-main-java" dir="${orig-src.dir}">
+        <include name="org/openstreetmap/josm/spi/preferences/**"/>
+    </fileset>
+</project>
